@@ -1,0 +1,64 @@
+khdem notes = [12, 15, 18, 20, 9];
+ikteb("First note: " + notes[0]);
+
+khdem x = 10;
+khdem y = 20;
+ikteb("Sum: " + (x + y));
+
+ken x > y a3mel {
+    ikteb("x is bigger");
+} sinon {
+    ikteb("y is bigger");
+}
+
+ikteb("For loop:");
+men i 1 7ata 3 a3mel {
+    ikteb("  Counter: " + i);
+}
+
+dallel add(a, b) {
+    rejje a + b;
+}
+khdem result = add(15, 25);
+ikteb("Add result: " + result);
+
+khdem counter = 0;
+tawa counter < 3 a3mel {
+    ikteb("While loop: " + counter);
+    counter = counter + 1;
+}
+
+ikteb_fi_mlf("data.txt", "Hello from Bou.Bel!");
+m7twa = iqra_mlf("data.txt");
+ikteb("File content: " + m7twa);
+
+class Animal {
+    hetha.name = "Unknown";
+    dallel set_name(n) {
+        hetha.name = n;
+    }
+}
+
+class Dog toroth Animal {
+    jdid(name) {
+        hetha.name = name;
+    }
+    dallel bark() {
+        ikteb(hetha.name + " says: Woof!");
+    }
+}
+
+khdem dog = new Dog("Rex");
+dog.bark();
+
+7awel {
+    ikteb("Trying something...");
+    khdem result2 = 10 / 2;
+    ikteb("Result: " + result2);
+} ebsed(e) {
+    ikteb("Caught error: " + e);
+} akhir {
+    ikteb("Finally block executed!");
+}
+
+ikteb("Program finished successfully!");
