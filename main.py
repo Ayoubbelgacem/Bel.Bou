@@ -14,7 +14,7 @@ from src.interpreter.interpreter import Interpreter
 from src.cli.repl import REPL
 from src.utils.errors import BouBelError
 
-def run_file(filename):
+def run_file(filename, debug=False):
     """Execute a Bou.Bel file"""
     try:
         with open(filename, 'r', encoding='utf-8') as f:
@@ -24,18 +24,13 @@ def run_file(filename):
         print("-" * 50)
         
         lexer = Lexer(code)
-        tokens = lexer.tokenize(debug=True)
-
-        print("\n===== TOKENS =====")
-        for i, token in enumerate(tokens):
-          if 60 <= i <= 100:
-           print(i, token)
-        print("==================\n")
+        tokens = lexer.tokenize(debug=debug)
         
         parser = Parser(tokens)
         ast = parser.parse()
         
         interpreter = Interpreter()
+        interpreter.debug = debug
         interpreter.interpret(ast)
         
         print("-" * 50)
@@ -59,6 +54,7 @@ Examples:
   python main.py test.bou     - Run a Bou.Bel file
   python main.py -i           - Start interactive REPL
   python main.py -v           - Show version
+  python main.py --debug test.bou  - Run with token/AST debug output
         """
     )
     parser.add_argument('file', nargs='?', help='Bou.Bel file to execute')
@@ -74,7 +70,7 @@ Examples:
         return
     
     if args.file:
-        run_file(args.file)
+        run_file(args.file, debug=args.debug)
     elif args.interactive:
         repl = REPL(debug=args.debug)
         repl.start()

@@ -83,6 +83,12 @@ class Interpreter:
             return self.environment[node.name]
         if node.name in self.objects:
             return self.objects[node.name]
+        # FIX (bug 3): permet d'utiliser une fonction déclarée (dallel ...)
+        # comme une valeur (callback) : on renvoie un callable Python qui
+        # exécute la fonction Bou.Bel correspondante.
+        if node.name in self.functions:
+            func_name = node.name
+            return lambda *args: self.call_user_function(func_name, list(args))
         return None
     
     def visit_BinOpNode(self, node):
@@ -212,12 +218,38 @@ class Interpreter:
         value = self.visit(node.value)
         raise ReturnException(value)
     
+    def call_user_function(self, func_name, args):
+        """
+        Exécute une fonction Bou.Bel déclarée (dallel ...) avec les
+        arguments déjà évalués `args`. Factorisé pour être réutilisable
+        aussi bien depuis un appel direct (CallNode) que depuis un
+        callback (fonction passée en paramètre, cf. visit_IdentifierNode).
+        """
+        func = self.functions[func_name]
+        
+        old_env = self.environment.copy()
+        self.environment = {}
+        
+        for i, param in enumerate(func['params']):
+            if i < len(args):
+                self.environment[param] = args[i]
+        
+        result = None
+        try:
+            for stmt in func['body']:
+                self.visit(stmt)
+        except ReturnException as e:
+            result = e.value
+        
+        self.environment = old_env
+        return result
+    
     def visit_CallNode(self, node):
         func_name = node.name
         if hasattr(node.name, 'name'):
             func_name = node.name.name
         
-        # Vérifier les callbacks
+        # Vérifier les callbacks (variables/paramètres contenant une fonction)
         if isinstance(func_name, str):
             func_obj = self.environment.get(func_name)
             if callable(func_obj):
@@ -229,27 +261,10 @@ class Interpreter:
         if builtin is not None:
             return builtin
         
-        # Vérifier les fonctions définies
-        if func_name in self.functions:
-            func = self.functions[func_name]
+        # Vérifier les fonctions définies (dallel ...)
+        if isinstance(func_name, str) and func_name in self.functions:
             args = [self.visit(arg) for arg in node.args]
-            
-            old_env = self.environment.copy()
-            self.environment = {}
-            
-            for i, param in enumerate(func['params']):
-                if i < len(args):
-                    self.environment[param] = args[i]
-            
-            result = None
-            try:
-                for stmt in func['body']:
-                    self.visit(stmt)
-            except ReturnException as e:
-                result = e.value
-            
-            self.environment = old_env
-            return result
+            return self.call_user_function(func_name, args)
         
         return None
     
@@ -333,6 +348,32 @@ class Interpreter:
                     return evaluated_args[0].pop()
                 else:
                     return evaluated_args[0].pop(int(evaluated_args[1]))
+            return None
+        # FIX (bug 2) : iqra_mlf / ikteb_fi_mlf doivent aussi fonctionner
+        # quand ils sont utilisés à l'intérieur d'une expression, par ex.
+        # "khdem contenu = iqra_mlf("fichier.txt");" — dans ce cas le
+        # parseur ne passe PAS par parse_file_read/parse_file_write
+        # (réservé aux appels en tout début de ligne), donc il faut aussi
+        # les gérer ici comme des fonctions "built-in".
+        elif name == "iqra_mlf":
+            if len(evaluated_args) > 0:
+                filename = str(evaluated_args[0])
+                try:
+                    with open(filename, 'r', encoding='utf-8') as f:
+                        return f.read()
+                except Exception as e:
+                    return f"Error: {e}"
+            return None
+        elif name == "ikteb_fi_mlf":
+            if len(evaluated_args) >= 2:
+                filename = str(evaluated_args[0])
+                content = str(evaluated_args[1])
+                try:
+                    with open(filename, 'w', encoding='utf-8') as f:
+                        f.write(content)
+                    return True
+                except Exception as e:
+                    return f"Error: {e}"
             return None
         
         return None
@@ -466,16 +507,22 @@ class Interpreter:
         return None
     
     def visit_MethodCallNode(self, node):
-        obj = self.environment.get(node.object_name)
-        
-        if obj is None:
-            obj = self._find_object(node.object_name)
-        
-        if obj is None:
-            for key, value in self.objects.items():
-                if key == node.object_name or value.get('__class__') == node.object_name:
-                    obj = value
-                    break
+        # FIX (bug 1) : node.object_name peut désormais être soit le nom
+        # (str) d'une variable (ex: "animal1"), soit directement un noeud
+        # AST à évaluer (ex: un ArrayAccessNode pour "animaux[i].afficher()").
+        if isinstance(node.object_name, str):
+            obj = self.environment.get(node.object_name)
+            
+            if obj is None:
+                obj = self._find_object(node.object_name)
+            
+            if obj is None:
+                for key, value in self.objects.items():
+                    if key == node.object_name or value.get('__class__') == node.object_name:
+                        obj = value
+                        break
+        else:
+            obj = self.visit(node.object_name)
         
         if isinstance(obj, dict) and '__methods__' in obj:
             method = obj['__methods__'].get(node.method_name)
@@ -624,3 +671,4 @@ class Interpreter:
     
     def get_output(self):
         return '\n'.join(self.output)
+        

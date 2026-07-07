@@ -304,6 +304,35 @@ class Parser:
                 self.advance()
                 name = self.expect(TokenType.IDENTIFIER).value
                 
+                # FIX (bug 1): si "." est suivi de "(", il s'agit d'un
+                # VÉRITABLE appel de méthode (ex: animal1.afficher(),
+                # animaux[i].afficher(), creer_chien(...).parler()) et
+                # doit produire un MethodCallNode, pas un CallNode(PropertyNode)
+                # qui n'est jamais reconnu par l'interpréteur.
+                if self.current_token() and self.current_token().type == TokenType.LPAREN:
+                    self.advance()
+                    args = []
+                    if self.current_token() and self.current_token().type != TokenType.RPAREN:
+                        while self.current_token() and self.current_token().type != TokenType.RPAREN:
+                            args.append(self.safe_parse_expression())
+                            if self.current_token() and self.current_token().type == TokenType.COMMA:
+                                self.advance()
+                    self.expect(TokenType.RPAREN)
+                    
+                    # Si la base est un simple identifiant (ex: animal1),
+                    # on garde le nom (string) pour compatibilité avec
+                    # l'interpréteur existant. Sinon (ex: animaux[i], ou
+                    # le résultat d'un autre appel), on garde le noeud
+                    # AST complet ; l'interpréteur sait maintenant
+                    # l'évaluer (cf. visit_MethodCallNode corrigé).
+                    if isinstance(node, IdentifierNode):
+                        object_ref = node.name
+                    else:
+                        object_ref = node
+                    
+                    node = MethodCallNode(object_ref, name, args)
+                    continue
+                
                 if self.current_token() and self.current_token().type == TokenType.EQUALS:
                     self.advance()
                     value = self.safe_parse_expression()
