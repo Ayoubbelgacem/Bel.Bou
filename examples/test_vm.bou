@@ -1,0 +1,633 @@
+# ============================================
+# BOU.BEL - TEST VM COMPLET
+# Teste TOUTES les fonctionnalités avec la VM
+# ============================================
+
+ikteb("========================================");
+ikteb("  🐪 BOU.BEL - VM TEST COMPLET");
+ikteb("========================================");
+ikteb("");
+
+# ============================================
+# 1. VARIABLES ET TYPES
+# ============================================
+ikteb("--- 1. VARIABLES ---");
+
+khdem nom = "Ayoub";
+khdem age = 25;
+khdem taille = 1.80;
+khdem actif = s7i7;
+khdem lettre = 'A';
+
+ikteb("Nom: " + nom);
+ikteb("Age: " + age);
+ikteb("Taille: " + taille);
+ikteb("Actif: " + actif);
+ikteb("Lettre: " + lettre);
+ikteb("");
+
+# ============================================
+# 2. ARITHMÉTIQUE
+# ============================================
+ikteb("--- 2. ARITHMÉTIQUE ---");
+
+khdem a = 10;
+khdem b = 3;
+
+ikteb("a = " + a + ", b = " + b);
+ikteb("a + b = " + (a + b));
+ikteb("a - b = " + (a - b));
+ikteb("a * b = " + (a * b));
+ikteb("a / b = " + (a / b));
+ikteb("a % b = " + (a % b));
+ikteb("");
+
+# ============================================
+# 3. COMPARAISONS
+# ============================================
+ikteb("--- 3. COMPARAISONS ---");
+
+khdem x = 10;
+khdem y = 20;
+
+ikteb("x = " + x + ", y = " + y);
+ikteb("x == y: " + (x == y));
+ikteb("x != y: " + (x != y));
+ikteb("x > y: " + (x > y));
+ikteb("x < y: " + (x < y));
+ikteb("x >= y: " + (x >= y));
+ikteb("x <= y: " + (x <= y));
+ikteb("");
+
+# ============================================
+# 4. CONDITIONS (IF/ELSE/ELSE IF)
+# ============================================
+ikteb("--- 4. CONDITIONS ---");
+
+khdem score = 85;
+
+ken score >= 90 a3mel {
+    ikteb("Score: " + score + " → Excellent!");
+} sinon_ken score >= 75 a3mel {
+    ikteb("Score: " + score + " → Bien!");
+} sinon_ken score >= 60 a3mel {
+    ikteb("Score: " + score + " → Passable!");
+} sinon {
+    ikteb("Score: " + score + " → Échec!");
+}
+
+khdem age_personne = 17;
+ken age_personne >= 18 a3mel {
+    ikteb("Vous êtes majeur.");
+} sinon {
+    ikteb("Vous êtes mineur.");
+}
+ikteb("");
+
+# ============================================
+# 5. BOUCLES FOR
+# ============================================
+ikteb("--- 5. BOUCLES FOR ---");
+
+# For simple
+ikteb("Comptage de 1 à 5:");
+i men 1 7ata 5 a3mel {
+    ikteb("  " + i);
+}
+
+# For avec calcul
+ikteb("Table de multiplication de 3:");
+i men 1 7ata 10 a3mel {
+    ikteb("  3 × " + i + " = " + (3 * i));
+}
+
+# For avec condition
+ikteb("Nombres pairs de 1 à 10:");
+i men 1 7ata 10 a3mel {
+    ken i % 2 == 0 a3mel {
+        ikteb("  " + i + " est pair");
+    }
+}
+ikteb("");
+
+# ============================================
+# 6. BOUCLES WHILE
+# ============================================
+ikteb("--- 6. BOUCLES WHILE ---");
+
+khdem compteur = 0;
+tawa compteur < 5 a3mel {
+    ikteb("Compteur: " + compteur);
+    compteur = compteur + 1;
+}
+
+# While avec condition complexe
+khdem z = 10;
+tawa z > 0 a3mel {
+    ikteb("z = " + z);
+    z = z - 2;
+}
+ikteb("");
+
+# ============================================
+# 7. FONCTIONS SIMPLES
+# ============================================
+ikteb("--- 7. FONCTIONS SIMPLES ---");
+
+# Addition
+dallel addition(a, b) {
+    rejje a + b;
+}
+khdem resultat = addition(15, 30);
+ikteb("15 + 30 = " + resultat);
+
+# Soustraction
+dallel soustraction(a, b) {
+    rejje a - b;
+}
+khdem resultat2 = soustraction(50, 20);
+ikteb("50 - 20 = " + resultat2);
+
+# Multiplication
+dallel multiplication(a, b) {
+    rejje a * b;
+}
+khdem resultat3 = multiplication(7, 8);
+ikteb("7 × 8 = " + resultat3);
+
+# Division
+dallel division(a, b) {
+    ken b == 0 a3mel {
+        rejje "Erreur: Division par zéro!";
+    }
+    rejje a / b;
+}
+ikteb("10 / 2 = " + division(10, 2));
+ikteb("10 / 0 = " + division(10, 0));
+ikteb("");
+
+# ============================================
+# 8. FONCTIONS AVEC CONDITIONS
+# ============================================
+ikteb("--- 8. FONCTIONS AVEC CONDITIONS ---");
+
+dallel est_pair(n) {
+    ken n % 2 == 0 a3mel {
+        rejje s7i7;
+    } sinon {
+        rejje ghalet;
+    }
+}
+ikteb("7 est pair? " + est_pair(7));
+ikteb("8 est pair? " + est_pair(8));
+
+dallel est_impair(n) {
+    rejje !est_pair(n);
+}
+ikteb("7 est impair? " + est_impair(7));
+ikteb("8 est impair? " + est_impair(8));
+ikteb("");
+
+# ============================================
+# 9. FONCTIONS RÉCURSIVES
+# ============================================
+ikteb("--- 9. FONCTIONS RÉCURSIVES ---");
+
+# Factorielle
+dallel factorielle(n) {
+    ken n <= 1 a3mel {
+        rejje 1;
+    } sinon {
+        rejje n * factorielle(n - 1);
+    }
+}
+ikteb("Factorielle de 0 = " + factorielle(0));
+ikteb("Factorielle de 1 = " + factorielle(1));
+ikteb("Factorielle de 5 = " + factorielle(5));
+ikteb("Factorielle de 7 = " + factorielle(7));
+
+# Fibonacci
+dallel fibonacci(n) {
+    ken n <= 1 a3mel {
+        rejje n;
+    } sinon {
+        rejje fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+ikteb("Fibonacci(0) = " + fibonacci(0));
+ikteb("Fibonacci(1) = " + fibonacci(1));
+ikteb("Fibonacci(5) = " + fibonacci(5));
+ikteb("Fibonacci(10) = " + fibonacci(10));
+ikteb("");
+
+# ============================================
+# 10. FONCTIONS AVEC MULTIPLES PARAMÈTRES
+# ============================================
+ikteb("--- 10. FONCTIONS MULTIPLES ---");
+
+dallel moyenne3(a, b, c) {
+    rejje (a + b + c) / 3;
+}
+ikteb("Moyenne de 10, 20, 30 = " + moyenne3(10, 20, 30));
+
+dallel max3(a, b, c) {
+    khdem max = a;
+    ken b > max a3mel {
+        max = b;
+    }
+    ken c > max a3mel {
+        max = c;
+    }
+    rejje max;
+}
+ikteb("Max de 10, 20, 30 = " + max3(10, 20, 30));
+ikteb("Max de 50, 20, 30 = " + max3(50, 20, 30));
+ikteb("");
+
+# ============================================
+# 11. FONCTIONS BUILT-IN
+# ============================================
+ikteb("--- 11. FONCTIONS BUILT-IN ---");
+
+khdem texte = "Bonjour Bou.Bel";
+ikteb("Texte: " + texte);
+ikteb("Longueur: " + len(texte));
+ikteb("Type: " + type(texte));
+
+khdem nombre = "123";
+ikteb("Nombre en string: " + nombre);
+ikteb("Converti en int: " + int(nombre));
+ikteb("Converti en float: " + float(nombre));
+
+khdem liste = [1, 2, 3, 4, 5];
+ikteb("Liste: " + liste);
+ikteb("Longueur de la liste: " + len(liste));
+ikteb("Sum de la liste: " + sum(liste));
+ikteb("Max de la liste: " + max(liste));
+ikteb("Min de la liste: " + min(liste));
+ikteb("");
+
+# ============================================
+# 12. ARRAYS
+# ============================================
+ikteb("--- 12. ARRAYS ---");
+
+khdem notes = [15, 18, 12, 20, 9, 14];
+ikteb("Notes: " + notes);
+ikteb("Première note: " + notes[0]);
+ikteb("Dernière note: " + notes[5]);
+ikteb("Nombre de notes: " + len(notes));
+
+# Modification
+notes[2] = 16;
+ikteb("Note modifiée (index 2): " + notes[2]);
+
+# Parcourir
+ikteb("Toutes les notes:");
+i men 0 7ata 5 a3mel {
+    ikteb("  Notes[" + i + "] = " + notes[i]);
+}
+
+# Array avec boucle while
+ikteb("Notes avec while:");
+khdem idx = 0;
+tawa idx < len(notes) a3mel {
+    ikteb("  Notes[" + idx + "] = " + notes[idx]);
+    idx = idx + 1;
+}
+ikteb("");
+
+# ============================================
+# 13. CLASSES ET OOP
+# ============================================
+ikteb("--- 13. CLASSES ET OOP ---");
+
+# Classe de base
+class Animal {
+    hetha.nom = "Inconnu";
+    hetha.age = 0;
+    
+    jdid(n, a) {
+        hetha.nom = n;
+        hetha.age = a;
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " fait un bruit.");
+    }
+    
+    dallel afficher() {
+        ikteb("Nom: " + hetha.nom + ", Age: " + hetha.age);
+    }
+}
+
+khdem animal1 = new Animal("Max", 3);
+animal1.afficher();
+animal1.parler();
+
+# Classe avec héritage
+class Chien toroth Animal {
+    hetha.race = "Inconnue";
+    
+    jdid(n, a, r) {
+        super(n, a);
+        hetha.race = r;
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " dit: Woof Woof! 🐶");
+    }
+    
+    dallel afficher() {
+        ikteb("🐕 Chien - Nom: " + hetha.nom + ", Age: " + hetha.age + ", Race: " + hetha.race);
+    }
+}
+
+khdem chien1 = new Chien("Rex", 5, "Berger Allemand");
+chien1.afficher();
+chien1.parler();
+
+# Autre classe
+class Chat toroth Animal {
+    jdid(n, a) {
+        super(n, a);
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " dit: Miaou! 🐱");
+    }
+    
+    dallel afficher() {
+        ikteb("🐱 Chat - Nom: " + hetha.nom + ", Age: " + hetha.age);
+    }
+}
+
+khdem chat1 = new Chat("Mimi", 2);
+chat1.afficher();
+chat1.parler();
+ikteb("");
+
+# ============================================
+# 14. HÉRITAGE AVEC OISEAU
+# ============================================
+ikteb("--- 14. HÉRITAGE ---");
+
+class Oiseau toroth Animal {
+    hetha.couleur = "Bleu";
+    
+    jdid(n, a, c) {
+        super(n, a);
+        hetha.couleur = c;
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " dit: Cui Cui! 🐦");
+    }
+    
+    dallel voler() {
+        ikteb(hetha.nom + " vole!");
+    }
+    
+    dallel afficher() {
+        ikteb("🐦 Oiseau - Nom: " + hetha.nom + ", Couleur: " + hetha.couleur);
+    }
+}
+
+khdem oiseau1 = new Oiseau("Pip", 1, "Jaune");
+oiseau1.afficher();
+oiseau1.parler();
+oiseau1.voler();
+ikteb("");
+
+# ============================================
+# 15. TRY/CATCH/FINALLY
+# ============================================
+ikteb("--- 15. TRY/CATCH/FINALLY ---");
+
+# Test sans erreur
+7awel {
+    ikteb("Tentative 1: Division normale...");
+    khdem result1 = 10 / 2;
+    ikteb("Résultat: " + result1);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 1)");
+}
+
+# Test avec erreur
+7awel {
+    ikteb("Tentative 2: Division par zéro...");
+    khdem result2 = 10 / 0;
+    ikteb("Résultat: " + result2);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 2)");
+}
+ikteb("");
+
+# ============================================
+# 16. LISTE D'ANIMAUX (ARRAY D'OBJETS)
+# ============================================
+ikteb("--- 16. LISTE D'ANIMAUX ---");
+
+khdem animaux = [
+    new Chien("Max", 3, "Berger"),
+    new Chat("Luna", 2),
+    new Oiseau("Titi", 1, "Rouge")
+];
+
+ikteb("Liste d'animaux:");
+i men 0 7ata len(animaux)-1 a3mel {
+    ikteb("Animal " + (i+1) + ":");
+    animaux[i].afficher();
+}
+ikteb("");
+
+# ============================================
+# 17. ALGORITHMES
+# ============================================
+ikteb("--- 17. ALGORITHMES ---");
+
+# Recherche
+dallel rechercher(tab, valeur) {
+    i men 0 7ata len(tab)-1 a3mel {
+        ken tab[i] == valeur a3mel {
+            rejje i;
+        }
+    }
+    rejje -1;
+}
+
+khdem nombres = [5, 12, 8, 20, 3, 15, 7];
+ikteb("Nombres: " + nombres);
+ikteb("Position de 20: " + rechercher(nombres, 20));
+ikteb("Position de 99: " + rechercher(nombres, 99));
+
+# Tri à bulles
+dallel trier(tab) {
+    khdem n = len(tab);
+    i men 0 7ata n-2 a3mel {
+        j men 0 7ata n-i-2 a3mel {
+            ken tab[j] > tab[j+1] a3mel {
+                khdem temp = tab[j];
+                tab[j] = tab[j+1];
+                tab[j+1] = temp;
+            }
+        }
+    }
+    rejje tab;
+}
+
+khdem nombres_tries = trier(nombres);
+ikteb("Nombres triés: " + nombres_tries);
+ikteb("");
+
+# ============================================
+# 18. STATISTIQUES
+# ============================================
+ikteb("--- 18. STATISTIQUES ---");
+
+dallel min(tab) {
+    khdem min_val = tab[0];
+    i men 1 7ata len(tab)-1 a3mel {
+        ken tab[i] < min_val a3mel {
+            min_val = tab[i];
+        }
+    }
+    rejje min_val;
+}
+
+dallel max(tab) {
+    khdem max_val = tab[0];
+    i men 1 7ata len(tab)-1 a3mel {
+        ken tab[i] > max_val a3mel {
+            max_val = tab[i];
+        }
+    }
+    rejje max_val;
+}
+
+dallel moyenne(tab) {
+    khdem sum = 0;
+    i men 0 7ata len(tab)-1 a3mel {
+        sum = sum + tab[i];
+    }
+    rejje sum / len(tab);
+}
+
+khdem stats = [3, 7, 2, 9, 5, 1, 8, 4, 6];
+ikteb("Statistiques: " + stats);
+ikteb("Min: " + min(stats));
+ikteb("Max: " + max(stats));
+ikteb("Moyenne: " + moyenne(stats));
+ikteb("");
+
+# ============================================
+# 19. CALLBACKS (FONCTIONS COMME PARAMÈTRES)
+# ============================================
+ikteb("--- 19. CALLBACKS ---");
+
+dallel double(x) {
+    rejje x * 2;
+}
+
+dallel triple(x) {
+    rejje x * 3;
+}
+
+dallel executer(fonction, valeur) {
+    rejje fonction(valeur);
+}
+
+ikteb("Double de 10 = " + executer(double, 10));
+ikteb("Triple de 10 = " + executer(triple, 10));
+ikteb("");
+
+# ============================================
+# 20. BOUCLES IMBRIQUÉES
+# ============================================
+ikteb("--- 20. BOUCLES IMBRIQUÉES ---");
+
+ikteb("Table de multiplication (5x5):");
+i men 1 7ata 5 a3mel {
+    khdem ligne = "";
+    j men 1 7ata 5 a3mel {
+        khdem produit = i * j;
+        ken j == 1 a3mel {
+            ligne = str(produit);
+        } sinon {
+            ligne = ligne + " " + str(produit);
+        }
+    }
+    ikteb(ligne);
+}
+ikteb("");
+
+# ============================================
+# 21. RÉCURSIVITÉ MULTIPLE
+# ============================================
+ikteb("--- 21. RÉCURSIVITÉ MULTIPLE ---");
+
+dallel puissance(base, exp) {
+    ken exp == 0 a3mel {
+        rejje 1;
+    } sinon {
+        rejje base * puissance(base, exp - 1);
+    }
+}
+
+ikteb("2^0 = " + puissance(2, 0));
+ikteb("2^5 = " + puissance(2, 5));
+ikteb("3^4 = " + puissance(3, 4));
+ikteb("");
+
+dallel pgcd(a, b) {
+    ken b == 0 a3mel {
+        rejje a;
+    } sinon {
+        rejje pgcd(b, a % b);
+    }
+}
+
+ikteb("PGCD(12, 8) = " + pgcd(12, 8));
+ikteb("PGCD(48, 18) = " + pgcd(48, 18));
+ikteb("PGCD(1071, 462) = " + pgcd(1071, 462));
+ikteb("");
+
+# ============================================
+# 22. PROGRAMME FINAL
+# ============================================
+ikteb("--- 22. RÉSULTAT FINAL ---");
+
+khdem notes_finales = [14, 16, 18, 12, 15, 17, 19, 13, 16, 15];
+khdem moyenne_finale = moyenne(notes_finales);
+khdem min_finale = min(notes_finales);
+khdem max_finale = max(notes_finales);
+
+ikteb("📊 Résultats finaux:");
+ikteb("  Notes: " + notes_finales);
+ikteb("  Moyenne: " + moyenne_finale);
+ikteb("  Minimum: " + min_finale);
+ikteb("  Maximum: " + max_finale);
+
+ken moyenne_finale >= 15 a3mel {
+    ikteb("✅ Félicitations! Excellente moyenne!");
+} sinon_ken moyenne_finale >= 12 a3mel {
+    ikteb("👍 Bien! Moyenne satisfaisante.");
+} sinon {
+    ikteb("📚 Travaillez encore plus fort!");
+}
+
+# ============================================
+# FIN DU PROGRAMME
+# ============================================
+ikteb("");
+ikteb("========================================");
+ikteb("  🎉 VM TEST TERMINÉ AVEC SUCCÈS!");
+ikteb("========================================");
+ikteb("  Bou.Bel - Langage de programmation");
+ikteb("  Tunisian Arabic Programming Language");
+ikteb("  Virtual Machine - Test complet");
+ikteb("========================================");
