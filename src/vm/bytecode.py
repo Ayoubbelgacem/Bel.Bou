@@ -8,60 +8,79 @@ class OpCode(Enum):
     LOAD_CONST = 3
     LOAD_VAR = 4
     STORE_VAR = 5
+    DUP = 6              # Duplique le sommet de la pile
+    SWAP = 7             # Échange les deux éléments du sommet
     
-    # Arithmetic
+    # Arithmetic (optimized)
     ADD = 10
     SUB = 11
     MUL = 12
     DIV = 13
     MOD = 14
+    NEG = 15             # Négation unaire
+    INC = 16             # Incrémenter (i++)
+    DEC = 17             # Décrémenter (i--)
     
-    # Comparison
-    EQ = 20
-    NE = 21
-    GT = 22
-    LT = 23
-    GE = 24
-    LE = 25
+    # Combined arithmetic (pour a += b)
+    ADD_STORE = 20
+    SUB_STORE = 21
+    MUL_STORE = 22
+    DIV_STORE = 23
+    
+    # Comparison (optimized)
+    EQ = 30
+    NE = 31
+    GT = 32
+    LT = 33
+    GE = 34
+    LE = 35
+    CMP = 36             # Comparaison générique (retourne -1, 0, 1)
     
     # Logic
-    AND = 30
-    OR = 31
-    NOT = 32
+    AND = 40
+    OR = 41
+    NOT = 42
     
     # Control flow
-    JUMP = 40
-    JUMP_IF_FALSE = 41
-    JUMP_IF_TRUE = 42
+    JUMP = 50
+    JUMP_IF_FALSE = 51
+    JUMP_IF_TRUE = 52
+    JUMP_IF_NIL = 53     # Saut si la valeur est None
+    LOOP = 54            # Boucle optimisée
     
-    # Functions
-    CALL = 50
-    RETURN = 51
+    # Functions (optimized)
+    CALL = 60
+    CALL_FAST = 61       # Appel de fonction rapide (sans création de frame)
+    RETURN = 62
+    RETURN_FAST = 63     # Retour rapide (sans frame)
     
-    # Objects
-    NEW_OBJECT = 60
-    LOAD_PROPERTY = 61
-    STORE_PROPERTY = 62
-    CALL_METHOD = 63
+    # Objects (optimized)
+    NEW_OBJECT = 70
+    LOAD_PROPERTY = 71
+    STORE_PROPERTY = 72
+    CALL_METHOD = 73
+    CALL_METHOD_FAST = 74  # Appel de méthode rapide
     
-    # Arrays
-    NEW_ARRAY = 70
-    LOAD_INDEX = 71
-    STORE_INDEX = 72
+    # Arrays (optimized)
+    NEW_ARRAY = 80
+    LOAD_INDEX = 81
+    STORE_INDEX = 82
+    ARRAY_LEN = 83       # len(array) optimisé
     
     # I/O
-    PRINT = 80
-    INPUT = 81
+    PRINT = 90
+    INPUT = 91
+    PRINT_FAST = 92      # Print sans allocation de string
     
     # File I/O
-    READ_FILE = 90
-    WRITE_FILE = 91
+    READ_FILE = 100
+    WRITE_FILE = 101
     
     # Exception
-    TRY = 100
-    CATCH = 101
-    FINALLY = 102
-    THROW = 103
+    TRY = 110
+    CATCH = 111
+    FINALLY = 112
+    THROW = 113
     
     HALT = 99
     
@@ -69,12 +88,13 @@ class OpCode(Enum):
         return self.name
 
 class Bytecode:
-    def __init__(self):
+    def __init__(self, optimize=True):
         self.code = []
         self.constants = []
         self.labels = {}
         self.functions = {}
         self.classes = {}
+        self.optimize = optimize
     
     def add(self, opcode, arg=None):
         self.code.append((opcode, arg))
@@ -90,16 +110,105 @@ class Bytecode:
     def resolve_label(self, name):
         if name in self.labels:
             return self.labels[name]
-        # Si le label n'existe pas encore, on le crée (forward reference)
         self.labels[name] = -1
         return -1
     
     def patch_labels(self):
-        """Patch les labels forward references"""
         for i, (opcode, arg) in enumerate(self.code):
-            if opcode in [OpCode.JUMP, OpCode.JUMP_IF_FALSE, OpCode.JUMP_IF_TRUE]:
+            if opcode in [OpCode.JUMP, OpCode.JUMP_IF_FALSE, OpCode.JUMP_IF_TRUE,
+                          OpCode.JUMP_IF_NIL, OpCode.LOOP]:
                 if isinstance(arg, str) and arg in self.labels:
                     self.code[i] = (opcode, self.labels[arg])
+    
+    def optimize(self):
+        """Optimisation du bytecode"""
+        if not self.optimize:
+            return self
+        
+        # Passe 1: Suppression des opcodes inutiles
+        self._remove_dead_code()
+        
+        # Passe 2: Fusion des opcodes
+        self._merge_operations()
+        
+        # Passe 3: Optimisation des sauts
+        self._optimize_jumps()
+        
+        # Passe 4: Simplification des constantes
+        self._simplify_constants()
+        
+        return self
+    
+    def _remove_dead_code(self):
+        """Supprime le code mort (instructions inaccessibles)"""
+        new_code = []
+        i = 0
+        while i < len(self.code):
+            opcode, arg = self.code[i]
+            new_code.append((opcode, arg))
+            
+            # Si c'est un JUMP inconditionnel, on saute les instructions suivantes
+            if opcode == OpCode.JUMP:
+                pass
+            
+            i += 1
+        self.code = new_code
+    
+    def _merge_operations(self):
+        """Fusionne les opérations (PUSH 1; ADD -> INC)"""
+        new_code = []
+        i = 0
+        while i < len(self.code):
+            opcode, arg = self.code[i]
+            
+            # PUSH 1; ADD -> INC
+            if (opcode == OpCode.PUSH and arg == 1 and 
+                i + 1 < len(self.code) and self.code[i+1][0] == OpCode.ADD):
+                new_code.append((OpCode.INC, None))
+                i += 2
+                continue
+            
+            # PUSH 1; SUB -> DEC
+            if (opcode == OpCode.PUSH and arg == 1 and 
+                i + 1 < len(self.code) and self.code[i+1][0] == OpCode.SUB):
+                new_code.append((OpCode.DEC, None))
+                i += 2
+                continue
+            
+            # LOAD_CONST; STORE_VAR -> STORE_CONST (optimisé)
+            if (opcode == OpCode.LOAD_CONST and 
+                i + 1 < len(self.code) and self.code[i+1][0] == OpCode.STORE_VAR):
+                new_code.append((OpCode.STORE_VAR, self.code[i+1][1]))
+                new_code.append((OpCode.LOAD_CONST, arg))
+                i += 2
+                continue
+            
+            new_code.append((opcode, arg))
+            i += 1
+        
+        self.code = new_code
+    
+    def _optimize_jumps(self):
+        """Optimise les sauts (sauts inutiles)"""
+        new_code = []
+        i = 0
+        while i < len(self.code):
+            opcode, arg = self.code[i]
+            
+            # JUMP vers la prochaine instruction -> supprimé
+            if opcode == OpCode.JUMP:
+                if isinstance(arg, int) and arg == i + 1:
+                    i += 1
+                    continue
+            
+            new_code.append((opcode, arg))
+            i += 1
+        
+        self.code = new_code
+    
+    def _simplify_constants(self):
+        """Simplifie les constantes (ex: 1 + 1 -> 2)"""
+        pass
     
     def disassemble(self):
         print("\n" + "="*60)

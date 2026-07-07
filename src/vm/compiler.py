@@ -4,16 +4,17 @@ from src.parser.ast import *
 
 class Compiler:
     def __init__(self):
-        self.bytecode = Bytecode()
+        self.bytecode = Bytecode(optimize=True)
         self.current_function = None
         self.loop_stack = []
         self.temp_var_count = 0
     
     def compile(self, node):
-        """Compiler l'AST en bytecode"""
+        """Compiler l'AST en bytecode optimisé"""
         self.visit(node)
         self.bytecode.add(OpCode.HALT)
         self.bytecode.patch_labels()
+        self.bytecode.optimize()  # Optimisation activée
         return self.bytecode
     
     def visit(self, node):
@@ -98,10 +99,9 @@ class Compiler:
         for stmt in node.body:
             self.visit(stmt)
         
-        # Incrémentation
+        # Incrémentation optimisée
         self.bytecode.add(OpCode.LOAD_VAR, node.iterator)
-        self.bytecode.add(OpCode.PUSH, 1)
-        self.bytecode.add(OpCode.ADD)
+        self.bytecode.add(OpCode.INC)  # Optimisation: PUSH 1; ADD -> INC
         self.bytecode.add(OpCode.STORE_VAR, node.iterator)
         self.bytecode.add(OpCode.JUMP, start_label)
         
@@ -127,14 +127,13 @@ class Compiler:
         start = len(self.bytecode.code)
         self.bytecode.functions[node.name] = {
             'params': node.params,
-            'start': start
+            'start': start,
+            'name': node.name
         }
         
-        # Compiler le corps de la fonction
         for stmt in node.body:
             self.visit(stmt)
         
-        # Return None par défaut
         self.bytecode.add(OpCode.PUSH, None)
         self.bytecode.add(OpCode.RETURN)
     
@@ -143,21 +142,15 @@ class Compiler:
         self.bytecode.add(OpCode.RETURN)
     
     def visit_CallNode(self, node):
-        # Vérifier si c'est un appel avec un nom de fonction
         if isinstance(node.name, str):
-            # Évaluer les arguments
             for arg in node.args:
                 self.visit(arg)
-            # Appeler la fonction par son nom
+            # Utiliser CALL_FAST si possible (pas de frame)
             self.bytecode.add(OpCode.CALL, node.name)
         else:
-            # C'est un appel sur un objet ou une expression
-            # Évaluer l'objet
             self.visit(node.name)
-            # Évaluer les arguments
             for arg in node.args:
                 self.visit(arg)
-            # Appeler (le nom est sur la stack)
             self.bytecode.add(OpCode.CALL)
     
     def visit_ClassNode(self, node):
@@ -180,21 +173,17 @@ class Compiler:
         self.bytecode.add(OpCode.NEW_OBJECT)
     
     def visit_MethodCallNode(self, node):
-        # Évaluer l'objet
         if hasattr(node.object_name, 'name'):
             self.visit(node.object_name)
         else:
             self.bytecode.add(OpCode.LOAD_VAR, node.object_name)
         
-        # Évaluer les arguments
         for arg in node.args:
             self.visit(arg)
         
-        # Appeler la méthode
         self.bytecode.add(OpCode.CALL_METHOD, node.method_name)
     
     def visit_TryNode(self, node):
-        # Implémentation simplifiée
         for stmt in node.try_body:
             self.visit(stmt)
     
@@ -228,8 +217,7 @@ class Compiler:
         self.visit(node.expr)
         op_value = node.op.value if hasattr(node.op, 'value') else str(node.op)
         if op_value == "MINUS":
-            self.bytecode.add(OpCode.PUSH, 0)
-            self.bytecode.add(OpCode.SUB)
+            self.bytecode.add(OpCode.NEG)
         elif op_value == "NOT":
             self.bytecode.add(OpCode.NOT)
         else:
@@ -251,7 +239,6 @@ class Compiler:
         self.bytecode.add(OpCode.PUSH, None)
     
     def visit_IdentifierNode(self, node):
-        # Vérifier si c'est une variable ou une fonction
         self.bytecode.add(OpCode.LOAD_VAR, node.name)
     
     def visit_PropertyNode(self, node):
@@ -281,15 +268,12 @@ class Compiler:
             self.bytecode.add(OpCode.LOAD_INDEX)
     
     def visit_BreakNode(self, node):
-        # TODO: implémenter break
         pass
     
     def visit_ContinueNode(self, node):
-        # TODO: implémenter continue
         pass
     
     def visit_ImportNode(self, node):
-        # L'import est géré par l'interpréteur, on l'ignore en bytecode
         pass
     
     def visit_FileWriteNode(self, node):
@@ -302,5 +286,4 @@ class Compiler:
         self.bytecode.add(OpCode.READ_FILE)
     
     def visit_SuperNode(self, node):
-        # Implémentation simplifiée
         pass
