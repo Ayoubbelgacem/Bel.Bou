@@ -1,12 +1,18 @@
 # src/interpreter/interpreter.py
+
 import os
 import sys
 from src.parser.ast import *
 
 class ReturnException(Exception):
-    """Exception pour capturer les retours des fonctions"""
     def __init__(self, value):
         self.value = value
+
+class BreakException(Exception):
+    pass
+
+class ContinueException(Exception):
+    pass
 
 class Interpreter:
     def __init__(self):
@@ -14,157 +20,141 @@ class Interpreter:
         self.functions = {}
         self.classes = {}
         self.output = []
-        self.arrays = {}
-        self.objects = {}
         self.last_result = None
         self.is_repl = False
+        self.debug = False
+        self.objects = {}
+        self.object_counter = 0
+        self.env_stack = []
     
     def interpret(self, node, is_repl=False):
         self.is_repl = is_repl
-        if isinstance(node, ProgramNode):
-            try:
-                for stmt in node.statements:
-                    result = self.visit(stmt)
-                    if is_repl and result is not None:
-                        print(result)
-            except ReturnException as e:
-                # Capturer le return si jamais il remonte
-                pass
-        elif is_repl:
-            result = self.visit(node)
-            if result is not None:
-                print(result)
-            return result
+        if hasattr(node, 'statements'):
+            for stmt in node.statements:
+                self.visit(stmt)
+        else:
+            return self.visit(node)
     
     def visit(self, node):
-        if isinstance(node, ProgramNode):
-            self.visit_program(node)
-        elif isinstance(node, VariableNode):
-            return self.visit_variable(node)
-        elif isinstance(node, AssignmentNode):
-            return self.visit_assignment(node)
-        elif isinstance(node, ArrayNode):
-            return self.visit_array(node)
-        elif isinstance(node, ArrayLiteralNode):
-            return self.visit_array_literal(node)
-        elif isinstance(node, ArrayAccessNode):
-            return self.visit_array_access(node)
-        elif isinstance(node, PrintNode):
-            return self.visit_print(node)
-        elif isinstance(node, InputNode):
-            return self.visit_input(node)
-        elif isinstance(node, FileWriteNode):
-            return self.visit_file_write(node)
-        elif isinstance(node, FileReadNode):
-            return self.visit_file_read(node)
-        elif isinstance(node, IfNode):
-            return self.visit_if(node)
-        elif isinstance(node, ForNode):
-            return self.visit_for(node)
-        elif isinstance(node, WhileNode):
-            return self.visit_while(node)
-        elif isinstance(node, FunctionNode):
-            return self.visit_function(node)
-        elif isinstance(node, ReturnNode):
-            return self.visit_return(node)
-        elif isinstance(node, CallNode):
-            return self.visit_call(node)
-        elif isinstance(node, ClassNode):
-            return self.visit_class(node)
-        elif isinstance(node, MethodNode):
-            return self.visit_method(node)
-        elif isinstance(node, NewNode):
-            return self.visit_new(node)
-        elif isinstance(node, MethodCallNode):
-            return self.visit_method_call(node)
-        elif isinstance(node, TryNode):
-            return self.visit_try(node)
-        elif isinstance(node, ImportNode):
-            return self.visit_import(node)
-        elif isinstance(node, BinOpNode):
-            return self.visit_binop(node)
-        elif isinstance(node, UnaryOpNode):
-            return self.visit_unary(node)
-        elif isinstance(node, NumberNode):
-            return node.value
-        elif isinstance(node, StringNode):
-            return node.value
-        elif isinstance(node, BooleanNode):
-            return node.value
-        elif isinstance(node, NullNode):
+        if node is None:
             return None
-        elif isinstance(node, IdentifierNode):
-            return self.visit_identifier(node)
-        elif isinstance(node, PropertyNode):
-            return self.visit_property(node)
-        elif isinstance(node, SuperNode):
-            return self.visit_super(node)
-        else:
-            return None
+        node_type = node.__class__.__name__
+        visit_method = getattr(self, f'visit_{node_type}', None)
+        if visit_method:
+            return visit_method(node)
+        return None
     
-    def visit_program(self, node):
+    def visit_ProgramNode(self, node):
         for stmt in node.statements:
             self.visit(stmt)
     
-    def visit_variable(self, node):
+    def visit_VariableNode(self, node):
         value = self.visit(node.value)
         self.environment[node.name] = value
-        return value
-    
-    def visit_assignment(self, node):
-        value = self.visit(node.value)
-        self.environment[node.name] = value
-        return value
-    
-    def visit_array(self, node):
-        elements = [self.visit(elem) for elem in node.elements]
-        self.environment[node.name] = elements
-        self.arrays[node.name] = elements
-        return elements
-    
-    def visit_array_literal(self, node):
-        return [self.visit(elem) for elem in node.elements]
-    
-    def visit_array_access(self, node):
-        # Si node est un ArrayAccessNode avec array_name (string)
-        if hasattr(node, 'array_name') and isinstance(node.array_name, str):
-            array = self.environment.get(node.array_name)
-            if array is None:
-                array = self.arrays.get(node.array_name)
-            
-            if array and isinstance(array, list):
-                index = self.visit(node.index)
-                if isinstance(index, int):
-                    if node.is_assignment:
-                        value = self.visit(node.value)
-                        if 0 <= index < len(array):
-                            array[index] = value
-                        else:
-                            while len(array) <= index:
-                                array.append(None)
-                            array[index] = value
-                        return value
-                    if 0 <= index < len(array):
-                        return array[index]
-                    return None
-            return None
         
-        # Si node est un ArrayAccessNode avec node (objet)
-        if hasattr(node, 'array_name') and hasattr(node.array_name, 'name'):
-            obj = self.environment.get(node.array_name.name)
-            if obj and isinstance(obj, list):
-                index = self.visit(node.index)
-                if isinstance(index, int) and 0 <= index < len(obj):
-                    if node.is_assignment:
-                        value = self.visit(node.value)
-                        obj[index] = value
-                        return value
-                    return obj[index]
-            return None
+        if isinstance(value, dict) and '__class__' in value:
+            self.objects[node.name] = value
+        
+        return value
+    
+    def visit_AssignmentNode(self, node):
+        value = self.visit(node.value)
+        self.environment[node.name] = value
+        
+        if isinstance(value, dict) and '__class__' in value:
+            self.objects[node.name] = value
+        
+        return value
+    
+    def visit_NumberNode(self, node):
+        return node.value
+    
+    def visit_StringNode(self, node):
+        return node.value
+    
+    def visit_BooleanNode(self, node):
+        return node.value
+    
+    def visit_NullNode(self, node):
+        return None
+    
+    def visit_IdentifierNode(self, node):
+        if node.name in self.environment:
+            return self.environment[node.name]
+        if node.name in self.objects:
+            return self.objects[node.name]
+        return None
+    
+    def visit_BinOpNode(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        
+        # Gérer les None
+        if left is None:
+            left = 0
+        if right is None:
+            right = 0
+        
+        op = node.op
+        
+        # Normalisation du token
+        op_value = None
+        if hasattr(op, "value"):
+            op_value = op.value
+        elif hasattr(op, "name"):
+            op_value = op.name
+        else:
+            op_value = str(op)
+        
+        # Comparaisons robustes
+        if op_value in ["PLUS", "TokenType.PLUS", "PLUS_EQUALS", "TokenType.PLUS_EQUALS"]:
+            if isinstance(left, str) or isinstance(right, str):
+                return str(left) + str(right)
+            return left + right
+        
+        if op_value in ["MINUS", "TokenType.MINUS", "MINUS_EQUALS", "TokenType.MINUS_EQUALS"]:
+            return left - right
+        
+        if op_value in ["STAR", "TokenType.STAR", "STAR_EQUALS", "TokenType.STAR_EQUALS"]:
+            return left * right
+        
+        if op_value in ["SLASH", "TokenType.SLASH", "SLASH_EQUALS", "TokenType.SLASH_EQUALS"]:
+            if right == 0:
+                raise Exception("Division by zero")
+            return left / right
+        
+        if op_value in ["MOD", "TokenType.MOD"]:
+            if right == 0:
+                raise Exception("Modulo by zero")
+            return left % right
+        
+        if op_value in ["GREATER", "TokenType.GREATER"]:
+            return left > right
+        
+        if op_value in ["LESS", "TokenType.LESS"]:
+            return left < right
+        
+        if op_value in ["GREATER_EQUAL", "TokenType.GREATER_EQUAL"]:
+            return left >= right
+        
+        if op_value in ["LESS_EQUAL", "TokenType.LESS_EQUAL"]:
+            return left <= right
+        
+        if op_value in ["EQUAL_EQUAL", "TokenType.EQUAL_EQUAL"]:
+            return left == right
+        
+        if op_value in ["NOT_EQUAL", "TokenType.NOT_EQUAL"]:
+            return left != right
+        
+        if op_value in ["AND", "TokenType.AND"]:
+            return left and right
+        
+        if op_value in ["OR", "TokenType.OR"]:
+            return left or right
         
         return None
     
-    def visit_print(self, node):
+    def visit_PrintNode(self, node):
         value = self.visit(node.value)
         output = str(value) if value is not None else ""
         print(output)
@@ -172,90 +162,79 @@ class Interpreter:
         self.last_result = output
         return output
     
-    def visit_input(self, node):
-        prompt = self.visit(node.prompt) if node.prompt else ""
-        return input(prompt)
-    
-    def visit_file_write(self, node):
-        filename = self.visit(node.filename)
-        content = self.visit(node.content)
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(str(content))
-            return True
-        except Exception as e:
-            return f"Error: {e}"
-    
-    def visit_file_read(self, node):
-        filename = self.visit(node.filename)
-        try:
-            with open(filename, 'r', encoding='utf-8') as f:
-                content = f.read()
-            return content
-        except Exception as e:
-            return f"Error: {e}"
-    
-    def visit_if(self, node):
+    def visit_IfNode(self, node):
         condition = self.visit(node.condition)
         if condition:
             for stmt in node.then_body:
-                result = self.visit(stmt)
-                if isinstance(stmt, ReturnNode):
-                    return result
+                self.visit(stmt)
         elif node.else_body:
-            for stmt in node.else_body:
-                result = self.visit(stmt)
-                if isinstance(stmt, ReturnNode):
-                    return result
+            if isinstance(node.else_body, list):
+                for stmt in node.else_body:
+                    self.visit(stmt)
+            elif isinstance(node.else_body, IfNode):
+                self.visit(node.else_body)
         return None
     
-    def visit_for(self, node):
+    def visit_ForNode(self, node):
         start = self.visit(node.start)
         end = self.visit(node.end)
         
         if start is None or end is None:
             return None
         
-        for i in range(int(start), int(end) + 1):
+        try:
+            start = int(start)
+            end = int(end)
+        except:
+            return None
+        
+        for i in range(start, end + 1):
             self.environment[node.iterator] = i
             for stmt in node.body:
-                result = self.visit(stmt)
-                if isinstance(stmt, ReturnNode):
-                    return result
+                self.visit(stmt)
+        
         return None
     
-    def visit_while(self, node):
+    def visit_WhileNode(self, node):
         while self.visit(node.condition):
             for stmt in node.body:
-                result = self.visit(stmt)
-                if isinstance(stmt, ReturnNode):
-                    return result
+                self.visit(stmt)
         return None
     
-    def visit_function(self, node):
+    def visit_FunctionNode(self, node):
         self.functions[node.name] = {
             'params': node.params,
-            'body': node.body,
-            'return_type': node.return_type
+            'body': node.body
         }
         return None
     
-    def visit_return(self, node):
+    def visit_ReturnNode(self, node):
         value = self.visit(node.value)
         raise ReturnException(value)
     
-    def visit_call(self, node):
+    def visit_CallNode(self, node):
+        func_name = node.name
+        if hasattr(node.name, 'name'):
+            func_name = node.name.name
+        
+        # Vérifier les callbacks
+        if isinstance(func_name, str):
+            func_obj = self.environment.get(func_name)
+            if callable(func_obj):
+                args = [self.visit(arg) for arg in node.args]
+                return func_obj(*args)
+        
         # Vérifier les fonctions built-in
-        builtin = self.call_builtin(node.name, node.args)
+        builtin = self.call_builtin(func_name, node.args)
         if builtin is not None:
             return builtin
         
-        # Vérifier les fonctions définies par l'utilisateur
-        if node.name in self.functions:
-            func = self.functions[node.name]
+        # Vérifier les fonctions définies
+        if func_name in self.functions:
+            func = self.functions[func_name]
             args = [self.visit(arg) for arg in node.args]
             
-            old_env = self.environment
+            old_env = self.environment.copy()
             self.environment = {}
             
             for i, param in enumerate(func['params']):
@@ -265,9 +244,7 @@ class Interpreter:
             result = None
             try:
                 for stmt in func['body']:
-                    result = self.visit(stmt)
-                    if isinstance(stmt, ReturnNode):
-                        break
+                    self.visit(stmt)
             except ReturnException as e:
                 result = e.value
             
@@ -281,9 +258,7 @@ class Interpreter:
         
         if name == "len":
             if len(evaluated_args) > 0:
-                if isinstance(evaluated_args[0], list):
-                    return len(evaluated_args[0])
-                elif isinstance(evaluated_args[0], str):
+                if isinstance(evaluated_args[0], (list, str, dict)):
                     return len(evaluated_args[0])
             return 0
         elif name == "str":
@@ -308,104 +283,155 @@ class Interpreter:
             if len(evaluated_args) > 0:
                 return type(evaluated_args[0]).__name__
             return "NoneType"
+        elif name == "print":
+            for arg in evaluated_args:
+                print(arg)
+            return None
         elif name == "input":
+            prompt = str(evaluated_args[0]) if evaluated_args else ""
+            return input(prompt)
+        elif name == "range":
+            if len(evaluated_args) == 1:
+                return list(range(int(evaluated_args[0])))
+            elif len(evaluated_args) == 2:
+                return list(range(int(evaluated_args[0]), int(evaluated_args[1])))
+            elif len(evaluated_args) == 3:
+                return list(range(int(evaluated_args[0]), int(evaluated_args[1]), int(evaluated_args[2])))
+            return []
+        elif name == "sum":
+            if len(evaluated_args) > 0 and isinstance(evaluated_args[0], list):
+                return sum(evaluated_args[0])
+            return 0
+        elif name == "max":
+            if len(evaluated_args) > 0 and isinstance(evaluated_args[0], list):
+                return max(evaluated_args[0])
+            if evaluated_args:
+                return max(evaluated_args)
+            return None
+        elif name == "min":
+            if len(evaluated_args) > 0 and isinstance(evaluated_args[0], list):
+                return min(evaluated_args[0])
+            if evaluated_args:
+                return min(evaluated_args)
+            return None
+        elif name == "abs":
             if len(evaluated_args) > 0:
-                return input(str(evaluated_args[0]))
-            return input()
-        elif name == "iqra_mlf":
-            if len(evaluated_args) > 0:
-                filename = str(evaluated_args[0])
-                try:
-                    with open(filename, 'r', encoding='utf-8') as f:
-                        return f.read()
-                except Exception as e:
-                    return f"Error: {e}"
-            return ""
-        elif name == "ikteb_fi_mlf":
-            if len(evaluated_args) >= 2:
-                filename = str(evaluated_args[0])
-                content = str(evaluated_args[1])
-                try:
-                    with open(filename, 'w', encoding='utf-8') as f:
-                        f.write(content)
-                    return True
-                except Exception as e:
-                    return f"Error: {e}"
-            return False
+                return abs(evaluated_args[0])
+            return 0
+        elif name == "sorted":
+            if len(evaluated_args) > 0 and isinstance(evaluated_args[0], list):
+                return sorted(evaluated_args[0])
+            return []
+        elif name == "append":
+            if len(evaluated_args) >= 2 and isinstance(evaluated_args[0], list):
+                evaluated_args[0].append(evaluated_args[1])
+                return evaluated_args[0]
+            return None
+        elif name == "pop":
+            if len(evaluated_args) >= 1 and isinstance(evaluated_args[0], list):
+                if len(evaluated_args) == 1:
+                    return evaluated_args[0].pop()
+                else:
+                    return evaluated_args[0].pop(int(evaluated_args[1]))
+            return None
         
         return None
     
-    def visit_class(self, node):
+    def visit_ArrayLiteralNode(self, node):
+        return [self.visit(elem) for elem in node.elements]
+    
+    def visit_ArrayAccessNode(self, node):
+        array = None
+        if hasattr(node.array_name, 'name'):
+            array = self.environment.get(node.array_name.name)
+            if array is None:
+                array = self.objects.get(node.array_name.name)
+        else:
+            array = self.visit(node.array_name)
+        
+        if isinstance(array, list):
+            index = self.visit(node.index)
+            try:
+                index = int(index)
+            except:
+                return None
+            
+            if node.is_assignment:
+                value = self.visit(node.value)
+                if 0 <= index < len(array):
+                    array[index] = value
+                else:
+                    while len(array) <= index:
+                        array.append(None)
+                    array[index] = value
+                return value
+            if 0 <= index < len(array):
+                return array[index]
+        return None
+    
+    def visit_ClassNode(self, node):
         self.classes[node.name] = {
             'parent': node.parent,
             'methods': {},
             'properties': {}
         }
         
-        # Add methods
         for method in node.methods:
             self.classes[node.name]['methods'][method.name] = method
         
-        # Add properties
-        for prop in node.properties:
-            if hasattr(prop, 'name'):
-                self.classes[node.name]['properties'][prop.name] = prop
+        for prop_name, prop_value in node.properties.items():
+            self.classes[node.name]['properties'][prop_name] = prop_value
         
         return None
     
-    def visit_method(self, node):
-        return node
+    def visit_MethodNode(self, node):
+        return {
+            'name': node.name,
+            'params': node.params,
+            'body': node.body
+        }
     
-    def _resolve_class_members(self, class_name):
-        """Walk up the inheritance chain (toroth/parent) collecting methods
-        and default properties, with subclasses overriding their parents."""
-        if class_name not in self.classes:
-            return {}, {}
-        
-        cls = self.classes[class_name]
-        methods = {}
-        properties = {}
-        
-        if cls.get('parent'):
-            parent_methods, parent_properties = self._resolve_class_members(cls['parent'])
-            methods.update(parent_methods)
-            properties.update(parent_properties)
-        
-        methods.update(cls['methods'])
-        properties.update(cls['properties'])
-        
-        return methods, properties
-    
-    def visit_new(self, node):
+    def visit_NewNode(self, node):
         class_name = node.class_name
         if class_name in self.classes:
-            # Create instance
             instance = {
                 '__class__': class_name,
                 '__properties__': {},
                 '__methods__': {}
             }
             
-            all_methods, all_properties = self._resolve_class_members(class_name)
+            cls = self.classes[class_name]
             
-            # Add methods (including inherited ones)
-            instance['__methods__'] = dict(all_methods)
+            # Ajouter les méthodes et propriétés du parent
+            if cls.get('parent'):
+                parent = self.classes.get(cls['parent'])
+                if parent:
+                    instance['__methods__'].update(parent['methods'])
+                    for prop_name, prop_value in parent['properties'].items():
+                        if prop_name not in instance['__properties__']:
+                            instance['__properties__'][prop_name] = None
             
-            # Initialize default property values (including inherited ones)
-            for prop_name, prop_node in all_properties.items():
-                if prop_node and prop_node.value is not None:
-                    instance['__properties__'][prop_name] = self.visit(prop_node.value)
+            # Ajouter les méthodes et propriétés de la classe
+            instance['__methods__'].update(cls['methods'])
+            for prop_name, prop_value in cls['properties'].items():
+                if prop_value is not None:
+                    instance['__properties__'][prop_name] = self.visit(prop_value)
                 else:
                     instance['__properties__'][prop_name] = None
             
-            # Store instance in objects
-            instance_id = len(self.objects)
-            self.objects[instance_id] = instance
+            # Stocker l'instance
+            if node.target:
+                self.environment[node.target] = instance
+                self.objects[node.target] = instance
+            else:
+                instance_id = f"obj_{self.object_counter}"
+                self.object_counter += 1
+                self.objects[instance_id] = instance
             
-            # Call constructor (jdid)
+            # Appeler le constructeur
             if 'jdid' in instance['__methods__']:
                 constructor = instance['__methods__']['jdid']
-                old_env = self.environment
+                old_env = self.environment.copy()
                 self.environment = {'hetha': instance}
                 
                 args = [self.visit(arg) for arg in node.args]
@@ -425,13 +451,30 @@ class Interpreter:
         
         return None
     
-    def visit_method_call(self, node):
+    def _find_object(self, name):
+        if name in self.environment:
+            obj = self.environment[name]
+            if isinstance(obj, dict) and '__class__' in obj:
+                return obj
+        
+        for key, obj in self.objects.items():
+            if obj.get('__class__') == name:
+                return obj
+            if key == name:
+                return obj
+        
+        return None
+    
+    def visit_MethodCallNode(self, node):
         obj = self.environment.get(node.object_name)
         
         if obj is None:
-            for o in self.objects.values():
-                if o.get('__class__') == node.object_name:
-                    obj = o
+            obj = self._find_object(node.object_name)
+        
+        if obj is None:
+            for key, value in self.objects.items():
+                if key == node.object_name or value.get('__class__') == node.object_name:
+                    obj = value
                     break
         
         if isinstance(obj, dict) and '__methods__' in obj:
@@ -439,7 +482,7 @@ class Interpreter:
             if method:
                 args = [self.visit(arg) for arg in node.args]
                 
-                old_env = self.environment
+                old_env = self.environment.copy()
                 self.environment = {'hetha': obj}
                 
                 for i, param in enumerate(method.params):
@@ -449,9 +492,7 @@ class Interpreter:
                 result = None
                 try:
                     for stmt in method.body:
-                        result = self.visit(stmt)
-                        if isinstance(stmt, ReturnNode):
-                            break
+                        self.visit(stmt)
                 except ReturnException as e:
                     result = e.value
                 
@@ -460,9 +501,23 @@ class Interpreter:
         
         return None
     
-    def visit_property(self, node):
+    def visit_PropertyNode(self, node):
         if isinstance(node.name, str):
             obj = self.environment.get('hetha')
+            
+            if obj is None:
+                for key, value in self.environment.items():
+                    if isinstance(value, dict) and '__class__' in value:
+                        if value.get('__class__') == node.name or key == node.name:
+                            obj = value
+                            break
+                if obj is None:
+                    for key, value in self.objects.items():
+                        if isinstance(value, dict) and '__class__' in value:
+                            if value.get('__class__') == node.name or key == node.name:
+                                obj = value
+                                break
+            
             if obj is None:
                 return None
             
@@ -472,133 +527,99 @@ class Interpreter:
                 return value
             
             return obj['__properties__'].get(node.name)
-        
-        if hasattr(node.name, 'name'):
-            obj = self.visit(node.name)
-            if obj and isinstance(obj, dict):
-                if node.is_assignment:
-                    value = self.visit(node.value)
-                    obj['__properties__'][node.name.name] = value
-                    return value
-                return obj['__properties__'].get(node.name.name)
-        
         return None
     
-    def visit_super(self, node):
-        obj = self.environment.get('hetha')
-        if obj:
-            parent_class = self.classes.get(obj['__class__']).get('parent')
-            if parent_class:
-                parent_methods = self._resolve_class_members(parent_class)[0]
-                if 'jdid' in parent_methods:
-                    constructor = parent_methods['jdid']
-                    args = [self.visit(arg) for arg in node.args]
-                    old_env = self.environment
-                    self.environment = {'hetha': obj}
-                    for i, param in enumerate(constructor.params):
-                        if i < len(args):
-                            self.environment[param] = args[i]
-                    try:
-                        for stmt in constructor.body:
-                            self.visit(stmt)
-                    except ReturnException:
-                        pass
-                    self.environment = old_env
-        return None
-    
-    def visit_try(self, node):
+    def visit_TryNode(self, node):
         try:
             for stmt in node.try_body:
-                result = self.visit(stmt)
-                if isinstance(stmt, ReturnNode):
-                    return result
+                self.visit(stmt)
         except Exception as e:
             if node.catch_var:
                 self.environment[node.catch_var] = str(e)
                 for stmt in node.catch_body:
-                    result = self.visit(stmt)
-                    if isinstance(stmt, ReturnNode):
-                        return result
+                    self.visit(stmt)
+            else:
+                raise
         finally:
             if node.finally_body:
                 for stmt in node.finally_body:
                     self.visit(stmt)
         return None
     
-    def visit_import(self, node):
+    def visit_ImportNode(self, node):
         module_name = node.module
         try:
-            # Try to import Python module
             module = __import__(module_name)
             self.environment[module_name] = module
-            print(f"✅ Module '{module_name}' imported")
+            if self.is_repl:
+                print(f"✅ Module '{module_name}' imported")
         except ImportError:
-            print(f"❌ Module '{module_name}' not found")
+            if self.is_repl:
+                print(f"❌ Module '{module_name}' not found")
         return None
     
-    def visit_binop(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
-        
-        # Gérer les None
-        if left is None and right is None:
-            if node.op.value == "PLUS":
-                return 0
-            return None
-        
-        if left is None:
-            if node.op.value == "PLUS":
-                left = ""
-            else:
-                left = 0
-        if right is None:
-            if node.op.value == "PLUS":
-                right = ""
-            else:
-                right = 0
-        
+    def visit_FileWriteNode(self, node):
+        filename = self.visit(node.filename)
+        content = self.visit(node.content)
+        try:
+            with open(str(filename), 'w', encoding='utf-8') as f:
+                f.write(str(content))
+            print(f"✅ Fichier '{filename}' écrit avec succès!")
+            return True
+        except Exception as e:
+            error_msg = f"Error: {e}"
+            print(error_msg)
+            return error_msg
+    
+    def visit_FileReadNode(self, node):
+        filename = self.visit(node.filename)
+        try:
+            with open(str(filename), 'r', encoding='utf-8') as f:
+                content = f.read()
+            if content:
+                print(content)
+            return content
+        except Exception as e:
+            error_msg = f"Error: {e}"
+            print(error_msg)
+            return error_msg
+    
+    def visit_UnaryOpNode(self, node):
+        expr = self.visit(node.expr)
         op_value = node.op.value if hasattr(node.op, 'value') else str(node.op)
         
-        if op_value == "PLUS":
-            if isinstance(left, str) or isinstance(right, str):
-                return str(left) + str(right)
-            return left + right
-        elif op_value == "MINUS":
-            return left - right
-        elif op_value == "STAR":
-            return left * right
-        elif op_value == "SLASH":
-            if right == 0:
-                raise Exception("Division by zero")
-            return left / right
-        elif op_value == "MOD":
-            if right == 0:
-                raise Exception("Modulo by zero")
-            return left % right
-        elif op_value == "GREATER":
-            return left > right
-        elif op_value == "LESS":
-            return left < right
-        elif op_value == "GREATER_EQUAL":
-            return left >= right
-        elif op_value == "LESS_EQUAL":
-            return left <= right
-        elif op_value == "EQUAL_EQUAL":
-            return left == right
-        elif op_value == "NOT_EQUAL":
-            return left != right
-        
-        return None
-    
-    def visit_unary(self, node):
-        expr = self.visit(node.expr)
-        if node.op.value == "MINUS":
-            return -expr
+        if op_value in ["MINUS", "TokenType.MINUS"]:
+            return -expr if expr is not None else 0
+        elif op_value in ["NOT", "TokenType.NOT"]:
+            return not expr
         return expr
     
-    def visit_identifier(self, node):
-        if node.name in self.environment:
-            return self.environment[node.name]
+    def visit_SuperNode(self, node):
+        obj = self.environment.get('hetha')
+        if obj and '__class__' in obj:
+            class_name = obj['__class__']
+            if class_name in self.classes:
+                parent = self.classes[class_name].get('parent')
+                if parent and parent in self.classes:
+                    parent_methods = self.classes[parent]['methods']
+                    if 'jdid' in parent_methods:
+                        constructor = parent_methods['jdid']
+                        args = [self.visit(arg) for arg in node.args]
+                        
+                        old_env = self.environment.copy()
+                        self.environment = {'hetha': obj}
+                        
+                        for i, param in enumerate(constructor.params):
+                            if i < len(args):
+                                self.environment[param] = args[i]
+                        
+                        try:
+                            for stmt in constructor.body:
+                                self.visit(stmt)
+                        except ReturnException:
+                            pass
+                        
+                        self.environment = old_env
         return None
     
     def get_output(self):

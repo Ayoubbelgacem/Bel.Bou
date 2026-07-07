@@ -1,4 +1,3 @@
-# src/lexer/lexer.py
 from src.lexer.token import Token, TokenType, KEYWORDS
 
 class Lexer:
@@ -8,10 +7,13 @@ class Lexer:
         self.line = 1
         self.column = 1
         self.tokens = []
+        self.debug = False
     
-    def tokenize(self):
+    def tokenize(self, debug=False):
+        self.debug = debug
         while self.position < len(self.code):
             char = self.current_char()
+            
             if char.isspace():
                 self.advance()
                 continue
@@ -34,14 +36,17 @@ class Lexer:
                 self.read_identifier()
                 continue
             self.read_symbol()
+        
         self.tokens.append(Token(TokenType.EOF, "EOF", self.line, self.column))
-         # DEBUG: Afficher les tokens avec leur position
-        print("\n" + "="*60)
-        print("TOKENS GENERATED:")
-        print("="*60)
-        for i, t in enumerate(self.tokens):
-           print(f"  {i:3d}: {t}")
-        print("="*60 + "\n")
+        
+        if self.debug:
+            print("\n" + "="*60)
+            print("TOKENS GENERATED:")
+            print("="*60)
+            for i, t in enumerate(self.tokens):
+                print(f"  {i:3d}: {t}")
+            print("="*60 + "\n")
+        
         return self.tokens
     
     def current_char(self):
@@ -68,12 +73,13 @@ class Lexer:
                 return True
             i += 1
         return False
-
+    
     def read_number(self):
         start_line = self.line
         start_col = self.column
         number = ""
         is_real = False
+        
         while self.position < len(self.code):
             char = self.current_char()
             if char.isdigit():
@@ -85,6 +91,7 @@ class Lexer:
                 self.advance()
             else:
                 break
+        
         token_type = TokenType.REAL if is_real else TokenType.NUMBER
         value = float(number) if is_real else int(number)
         self.tokens.append(Token(token_type, value, start_line, start_col))
@@ -94,13 +101,31 @@ class Lexer:
         start_col = self.column
         self.advance()
         string = ""
+        
         while self.position < len(self.code):
             char = self.current_char()
             if char == '"':
                 self.advance()
                 break
-            string += char
-            self.advance()
+            if char == '\\':
+                self.advance()
+                if self.position < len(self.code):
+                    escape = self.current_char()
+                    if escape == 'n':
+                        string += '\n'
+                    elif escape == 't':
+                        string += '\t'
+                    elif escape == '\\':
+                        string += '\\'
+                    elif escape == '"':
+                        string += '"'
+                    else:
+                        string += escape
+                    self.advance()
+            else:
+                string += char
+                self.advance()
+        
         self.tokens.append(Token(TokenType.STRING, string, start_line, start_col))
     
     def read_char(self):
@@ -117,6 +142,7 @@ class Lexer:
         start_line = self.line
         start_col = self.column
         identifier = ""
+        
         while self.position < len(self.code):
             char = self.current_char()
             if char.isalnum() or char == '_':
@@ -124,12 +150,14 @@ class Lexer:
                 self.advance()
             else:
                 break
+        
         if identifier in KEYWORDS:
             token_type = TokenType.KEYWORD
             value = KEYWORDS[identifier]
         else:
             token_type = TokenType.IDENTIFIER
             value = identifier
+        
         self.tokens.append(Token(token_type, value, start_line, start_col))
     
     def read_symbol(self):
@@ -143,20 +171,48 @@ class Lexer:
             self.advance()
             self.tokens.append(Token(TokenType.EQUAL_EQUAL, "==", start_line, start_col))
             return
+        
         if char == '!' and self.peek() == '=':
             self.advance()
             self.advance()
             self.tokens.append(Token(TokenType.NOT_EQUAL, "!=", start_line, start_col))
             return
+        
         if char == '>' and self.peek() == '=':
             self.advance()
             self.advance()
             self.tokens.append(Token(TokenType.GREATER_EQUAL, ">=", start_line, start_col))
             return
+        
         if char == '<' and self.peek() == '=':
             self.advance()
             self.advance()
             self.tokens.append(Token(TokenType.LESS_EQUAL, "<=", start_line, start_col))
+            return
+        
+        # Compound assignments
+        if char == '+' and self.peek() == '=':
+            self.advance()
+            self.advance()
+            self.tokens.append(Token(TokenType.PLUS_EQUALS, "+=", start_line, start_col))
+            return
+        
+        if char == '-' and self.peek() == '=':
+            self.advance()
+            self.advance()
+            self.tokens.append(Token(TokenType.MINUS_EQUALS, "-=", start_line, start_col))
+            return
+        
+        if char == '*' and self.peek() == '=':
+            self.advance()
+            self.advance()
+            self.tokens.append(Token(TokenType.STAR_EQUALS, "*=", start_line, start_col))
+            return
+        
+        if char == '/' and self.peek() == '=':
+            self.advance()
+            self.advance()
+            self.tokens.append(Token(TokenType.SLASH_EQUALS, "/=", start_line, start_col))
             return
         
         # Single symbols

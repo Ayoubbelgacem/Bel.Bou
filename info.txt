@@ -1,1 +1,3 @@
-Nom: Ayoub\nAge: 25\nVille: Tunis
+Nom: Ayoub
+Age: 25
+Ville: Tunis

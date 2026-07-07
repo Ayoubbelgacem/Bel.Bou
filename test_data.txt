@@ -1,1 +1,2 @@
-Bienvenue dans Bou.Bel!\nCeci est un test complet.
+Bienvenue dans Bou.Bel!
+Ceci est un test complet.

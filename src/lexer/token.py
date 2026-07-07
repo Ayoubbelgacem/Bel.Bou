@@ -1,4 +1,3 @@
-# src/lexer/token.py
 from enum import Enum
 
 class TokenType(Enum):
@@ -40,7 +39,13 @@ class TokenType(Enum):
     AND = "AND"
     OR = "OR"
     NOT = "NOT"
-
+    
+    # Assignment
+    PLUS_EQUALS = "PLUS_EQUALS"
+    MINUS_EQUALS = "MINUS_EQUALS"
+    STAR_EQUALS = "STAR_EQUALS"
+    SLASH_EQUALS = "SLASH_EQUALS"
+    
     EOF = "EOF"
     UNKNOWN = "UNKNOWN"
 
@@ -72,6 +77,7 @@ KEYWORDS = {
     # Logical operators
     "and": "AND",
     "or": "OR",
+    "not": "NOT",
     
     # Loops
     "men": "FOR",
