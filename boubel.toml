@@ -1,0 +1,11 @@
+[package]
+name = "mon_projet"
+version = "0.1.0"
+description = "Un projet Bou.Bel"
+
+[dependencies]
+math = "1.0.0"
+json = "0.2.0"
+
+[dev-dependencies]
+test = "0.1.0"

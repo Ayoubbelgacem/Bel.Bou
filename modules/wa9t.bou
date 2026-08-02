@@ -1,0 +1,21 @@
+#wa9t.bou - Bibliothèque de temps (nécessite support C)
+# Fonctions : waqet (timestamp), rqed (sleep)
+#
+# ⚠️ Renommé de tawa() -> waqet() : 'tawa' est déjà le mot-clé du 'while'
+# dans Bou.Bel (ex: "tawa compteur < 5 a3mel { ... }"). Le lexer tokenise
+# 'tawa' comme KEYWORD:WHILE avant de savoir qu'on voulait un identifiant
+# de fonction, ce qui provoquait une erreur de parsing sur
+# "fonction tawa() {" (IDENTIFIER attendu, KEYWORD trouvé).
+
+# Waqet : retourne le timestamp UNIX actuel
+fonction waqet() {
+    # Nécessite boubel_time_now() dans le runtime
+    retourner time_now();
+}
+
+#Rqed : met en pause le programme (secondes)
+fonction rqed(secondes) {
+    #Nécessite boubel_sleep(secondes) dans le runtime
+    sleep(secondes);
+    retourner 0;
+}

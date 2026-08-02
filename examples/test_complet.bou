@@ -37,11 +37,9 @@ ikteb("Première note: " + notes[0]);
 ikteb("Dernière note: " + notes[5]);
 ikteb("Nombre de notes: " + len(notes));
 
-# Modification d'un élément
 notes[2] = 16;
 ikteb("Note modifiée (index 2): " + notes[2]);
 
-# Parcourir un tableau
 ikteb("Toutes les notes:");
 i men 0 7ata 5 a3mel {
     ikteb("  Notes[" + i + "] = " + notes[i]);
@@ -92,19 +90,16 @@ ikteb("");
 # ============================================
 ikteb("--- 5. BOUCLES FOR ---");
 
-# For simple
 ikteb("Comptage de 1 à 5:");
 i men 1 7ata 5 a3mel {
     ikteb("  " + i);
 }
 
-# For avec calcul
 ikteb("Table de multiplication de 3:");
 i men 1 7ata 10 a3mel {
     ikteb("  3 × " + i + " = " + (3 * i));
 }
 
-# For avec condition
 ikteb("Nombres pairs de 1 à 10:");
 i men 1 7ata 10 a3mel {
     ken i % 2 == 0 a3mel {
@@ -124,7 +119,6 @@ tawa compteur < 5 a3mel {
     compteur = compteur + 1;
 }
 
-# While avec condition complexe
 khdem x = 10;
 tawa x > 0 a3mel {
     ikteb("x = " + x);
@@ -137,14 +131,12 @@ ikteb("");
 # ============================================
 ikteb("--- 7. FONCTIONS ---");
 
-# Fonction simple
 dallel addition(a, b) {
     rejje a + b;
 }
 khdem resultat = addition(15, 30);
 ikteb("15 + 30 = " + resultat);
 
-# Fonction avec condition
 dallel est_pair(n) {
     ken n % 2 == 0 a3mel {
         rejje s7i7;
@@ -155,7 +147,6 @@ dallel est_pair(n) {
 ikteb("7 est pair? " + est_pair(7));
 ikteb("8 est pair? " + est_pair(8));
 
-# Fonction récursive (factorielle)
 dallel factorielle(n) {
     ken n <= 1 a3mel {
         rejje 1;
@@ -166,7 +157,6 @@ dallel factorielle(n) {
 ikteb("Factorielle de 5 = " + factorielle(5));
 ikteb("Factorielle de 7 = " + factorielle(7));
 
-# Fonction avec multiple paramètres
 dallel moyenne(a, b, c) {
     rejje (a + b + c) / 3;
 }
@@ -193,7 +183,6 @@ ikteb("");
 # ============================================
 ikteb("--- 9. CLASSES ET OOP ---");
 
-# Classe de base
 class Animal {
     hetha.nom = "Inconnu";
     hetha.age = 0;
@@ -212,12 +201,10 @@ class Animal {
     }
 }
 
-# Création d'un animal
 khdem animal1 = new Animal("Max", 3);
 animal1.afficher();
 animal1.parler();
 
-# Classe avec héritage
 class Chien toroth Animal {
     hetha.race = "Inconnue";
     
@@ -239,7 +226,6 @@ khdem chien1 = new Chien("Rex", 5, "Berger Allemand");
 chien1.afficher();
 chien1.parler();
 
-# Autre classe avec héritage
 class Chat toroth Animal {
     jdid(n, a) {
         super(n, a);
@@ -291,49 +277,19 @@ oiseau1.parler();
 oiseau1.voler();
 ikteb("");
 
-# ============================================
-# 11. TRY/CATCH/FINALLY
-# ============================================
-ikteb("--- 11. TRY/CATCH/FINALLY ---");
-
-# Test sans erreur
-7awel {
-    ikteb("Tentative 1: Division normale...");
-    khdem result1 = 10 / 2;
-    ikteb("Résultat: " + result1);
-} ebsed(e) {
-    ikteb("❌ Erreur attrapée: " + e);
-} akhir {
-    ikteb("✅ Finally exécuté (Tentative 1)");
-}
-
-# Test avec erreur
-7awel {
-    ikteb("Tentative 2: Division par zéro...");
-    khdem result2 = 10 / 0;
-    ikteb("Résultat: " + result2);
-} ebsed(e) {
-    ikteb("❌ Erreur attrapée: " + e);
-} akhir {
-    ikteb("✅ Finally exécuté (Tentative 2)");
-}
-ikteb("");
 
 # ============================================
 # 12. FICHIERS (FILE I/O)
 # ============================================
 ikteb("--- 12. FICHIERS ---");
 
-# Écriture dans un fichier
 ikteb_fi_mlf("test_data.txt", "Bienvenue dans Bou.Bel!\nCeci est un test complet.");
 ikteb("✅ Fichier écrit avec succès!");
 
-# Lecture d'un fichier
 khdem contenu = iqra_mlf("test_data.txt");
 ikteb("Contenu du fichier:");
 ikteb(contenu);
 
-# Écriture de données structurées
 khdem texte2 = "Nom: Ayoub\nAge: 25\nVille: Tunis";
 ikteb_fi_mlf("info.txt", texte2);
 ikteb("✅ Informations sauvegardées!");
@@ -348,7 +304,6 @@ ikteb("");
 # ============================================
 ikteb("--- 13. COMBINAISON ---");
 
-# Fonction qui utilise un tableau
 dallel calculer_moyenne(tab) {
     khdem sum = 0;
     i men 0 7ata len(tab)-1 a3mel {
@@ -362,7 +317,6 @@ khdem moyenne_generale = calculer_moyenne(mes_notes);
 ikteb("Mes notes: " + mes_notes);
 ikteb("Moyenne générale: " + moyenne_generale);
 
-# Fonction avec classe
 dallel creer_chien(nom, age, race) {
     rejje new Chien(nom, age, race);
 }
@@ -377,7 +331,6 @@ ikteb("");
 # ============================================
 ikteb("--- 14. ALGORITHMES ---");
 
-# Algorithme de recherche
 dallel rechercher(tab, valeur) {
     i men 0 7ata len(tab)-1 a3mel {
         ken tab[i] == valeur a3mel {
@@ -394,7 +347,6 @@ ikteb("Nombres: " + nombres);
 ikteb("Position de 20: " + recherche1);
 ikteb("Position de 99: " + recherche2);
 
-# Algorithme de tri (bulle)
 dallel trier(tab) {
     khdem n = len(tab);
     i men 0 7ata n-2 a3mel {
@@ -418,7 +370,6 @@ ikteb("");
 # ============================================
 ikteb("--- 15. EXEMPLES AVANCÉS ---");
 
-# Gestion d'une liste d'animaux
 khdem animaux = [
     new Chien("Max", 3, "Berger"),
     new Chat("Luna", 2),
@@ -431,7 +382,6 @@ i men 0 7ata len(animaux)-1 a3mel {
     animaux[i].afficher();
 }
 
-# Fonction avec callback
 dallel executer(fonction, valeur) {
     rejje fonction(valeur);
 }
@@ -449,7 +399,9 @@ ikteb("");
 # ============================================
 ikteb("--- 16. STATISTIQUES ---");
 
-dallel min(tab) {
+# NOTE: "min" est un mot-clé réservé (boucle "min i < 5 a3mel {...}"),
+# donc impossible de nommer une fonction "min". On utilise "valeur_min".
+dallel valeur_min(tab) {
     khdem min_val = tab[0];
     i men 1 7ata len(tab)-1 a3mel {
         ken tab[i] < min_val a3mel {
@@ -471,7 +423,7 @@ dallel max(tab) {
 
 khdem stats = [3, 7, 2, 9, 5, 1, 8, 4, 6];
 ikteb("Statistiques: " + stats);
-ikteb("Min: " + min(stats));
+ikteb("Min: " + valeur_min(stats));
 ikteb("Max: " + max(stats));
 ikteb("Moyenne: " + calculer_moyenne(stats));
 ikteb("");
@@ -481,7 +433,6 @@ ikteb("");
 # ============================================
 ikteb("--- 17. EXCEPTIONS ---");
 
-# Test d'exception dans une fonction
 dallel diviser(a, b) {
     ken b == 0 a3mel {
         rejje "Erreur: Division par zéro!";
@@ -498,7 +449,6 @@ ikteb("");
 # ============================================
 ikteb("--- 18. BOUCLES IMBRIQUÉES ---");
 
-# Multiplication table
 ikteb("Table de multiplication (5x5):");
 i men 1 7ata 5 a3mel {
     khdem ligne = "";
@@ -521,7 +471,7 @@ ikteb("--- 19. RÉSULTAT FINAL ---");
 
 khdem notes_finales = [14, 16, 18, 12, 15, 17, 19, 13, 16, 15];
 khdem moyenne_finale = calculer_moyenne(notes_finales);
-khdem min_finale = min(notes_finales);
+khdem min_finale = valeur_min(notes_finales);
 khdem max_finale = max(notes_finales);
 
 ikteb("📊 Résultats finaux:");
@@ -548,3 +498,29 @@ ikteb("========================================");
 ikteb("  Bou.Bel - Langage de programmation");
 ikteb("  Tunisian Arabic Programming Language");
 ikteb("========================================");
+
+# ============================================
+# 11. TRY/CATCH/FINALLY
+# ============================================
+ikteb("--- 11. TRY/CATCH/FINALLY ---");
+
+7awel {
+    ikteb("Tentative 1: Division normale...");
+    khdem result1 = 10 / 2;
+    ikteb("Résultat: " + result1);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 1)");
+}
+
+7awel {
+    ikteb("Tentative 2: Division par zéro...");
+    khdem result2 = 10 / 0;
+    ikteb("Résultat: " + result2);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 2)");
+}
+ikteb("");

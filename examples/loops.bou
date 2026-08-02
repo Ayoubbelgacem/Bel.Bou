@@ -1,0 +1,26 @@
+ikteb("Comptage de 1 à 5:");
+i men 1 7ata 5 a3mel {
+    ikteb("  " + i);
+}
+
+ikteb("");
+ikteb("Table de multiplication de 3:");
+i men 1 7ata 10 a3mel {
+    ikteb("  3 × " + i + " = " + (3 * i));
+}
+
+ikteb("");
+ikteb("Nombres pairs de 1 à 10:");
+i men 1 7ata 10 a3mel {
+    ken i % 2 == 0 a3mel {
+        ikteb("  " + i + " est pair");
+    }
+}
+
+ikteb("");
+ikteb("Boucle WHILE:");
+khdem compteur = 0;
+tawa compteur < 5 a3mel {
+    ikteb("  Compteur: " + compteur);
+    compteur = compteur + 1;
+}

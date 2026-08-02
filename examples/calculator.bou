@@ -1,0 +1,82 @@
+# ============================================
+# CALCULATRICE SIMPLE - VERSION CORRIGÉE
+# ============================================
+
+dallel afficher_menu() {
+    ikteb("=== CALCULATRICE ===");
+    ikteb("1. Addition");
+    ikteb("2. Soustraction");
+    ikteb("3. Multiplication");
+    ikteb("4. Division");
+    ikteb("5. Quitter");
+}
+
+dallel addition(a, b) {
+    rejje a + b;
+}
+
+dallel soustraction(a, b) {
+    rejje a - b;
+}
+
+dallel multiplication(a, b) {
+    rejje a * b;
+}
+
+dallel division(a, b) {
+    ken b == 0 a3mel {
+        t7at "Division par zéro!";
+    }
+    rejje a / b;
+}
+
+ikteb("=== CALCULATRICE BOU.BEL ===");
+
+khdem continuer = s7i7;
+
+tawa continuer a3mel {
+    ikteb("");
+    afficher_menu();
+    ikteb("");
+    
+    khdem choix = input("Choisissez une option (1-5): ");
+    
+    ken choix == "5" a3mel {
+        continuer = ghalet;
+        ikteb("Au revoir!");
+    } sinon_ken choix == "1" a3mel {
+        khdem a = input("Entrez le premier nombre: ");
+        khdem b = input("Entrez le deuxième nombre: ");
+        khdem a_num = float(a);
+        khdem b_num = float(b);
+        khdem result = addition(a_num, b_num);
+        ikteb(a_num + " + " + b_num + " = " + result);
+    } sinon_ken choix == "2" a3mel {
+        khdem a = input("Entrez le premier nombre: ");
+        khdem b = input("Entrez le deuxième nombre: ");
+        khdem a_num = float(a);
+        khdem b_num = float(b);
+        khdem result = soustraction(a_num, b_num);
+        ikteb(a_num + " - " + b_num + " = " + result);
+    } sinon_ken choix == "3" a3mel {
+        khdem a = input("Entrez le premier nombre: ");
+        khdem b = input("Entrez le deuxième nombre: ");
+        khdem a_num = float(a);
+        khdem b_num = float(b);
+        khdem result = multiplication(a_num, b_num);
+        ikteb(a_num + " × " + b_num + " = " + result);
+    } sinon_ken choix == "4" a3mel {
+        khdem a = input("Entrez le premier nombre: ");
+        khdem b = input("Entrez le deuxième nombre: ");
+        khdem a_num = float(a);
+        khdem b_num = float(b);
+        7awel {
+            khdem result = division(a_num, b_num);
+            ikteb(a_num + " ÷ " + b_num + " = " + result);
+        } ebsed(e) {
+            ikteb("❌ Erreur: " + e);
+        }
+    } sinon {
+        ikteb("❌ Option invalide!");
+    }
+}

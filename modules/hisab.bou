@@ -1,0 +1,4 @@
+fonction pi() { retourner 3.14159; }
+fonction e() { retourner 2.71828; }
+fonction carre(x) { retourner x * x; }
+fonction cube(x) { retourner x * x * x; }

@@ -1,0 +1,3 @@
+fonction kbir(s) { retourner s; }
+fonction sghir(s) { retourner s; }
+fonction fih(s, sub) { retourner ghalet; }

@@ -1,0 +1,11 @@
+// wa9t.bou - Temps (timestamp, pause)
+// Utilise les built‑ins time_now et sleep
+
+fonction time_now() {
+    retourner time_now();
+}
+
+fonction rqed(secondes) {
+    sleep(secondes);
+    retourner 0;
+}

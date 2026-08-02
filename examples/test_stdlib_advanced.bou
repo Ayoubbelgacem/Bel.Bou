@@ -1,0 +1,23 @@
+jib "wa9t";
+jib "json";
+
+ikteb("⏱️ Test de wa9t.bou");
+khdem t1 = time_now();
+ikteb("Timestamp avant: " + t1);
+
+ikteb("🛌 Pause de 2 secondes...");
+rqed(2);
+
+khdem t2 = time_now();
+ikteb("Timestamp après: " + t2);
+ikteb("Différence: " + (t2 - t1) + " secondes");
+
+ikteb("");
+
+ikteb("📝 Test de json.bou");
+khdem liste = [1, 2, 3, "test", s7i7];
+khdem json_list = to_json(liste);
+ikteb("Liste originale: " + liste);
+ikteb("JSON encodé: " + json_list);
+
+ikteb("✅ Test terminé");

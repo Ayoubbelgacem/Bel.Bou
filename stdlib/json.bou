@@ -1,0 +1,12 @@
+// json.bou - Module JSON pour Bou.Bel
+// Fournit des fonctions pour encoder/décoder JSON
+
+fonction to_json(valeur) {
+    // Appelle le built-in to_json
+    retourner to_json(valeur);
+}
+
+fonction from_json(texte) {
+    // À implémenter (le built-in nexiste pas encore)
+    retourner null;
+}

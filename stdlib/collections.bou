@@ -1,0 +1,9 @@
+// collections.bou - Structures de données
+
+fonction Map() {
+    // Simple dictionnaire
+    khdem map = {};
+    map["get"] = fonction(key) { retourner hetha[key]; };
+    map["set"] = fonction(key, value) { hetha[key] = value; };
+    retourner map;
+}

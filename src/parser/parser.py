@@ -76,6 +76,29 @@ class Parser:
                 return self.parse_input()
             elif token.value == "IF":
                 return self.parse_if()
+            elif token.value == "MIN":
+                # Vérifier si c'est une boucle min ou un appel de fonction
+                if self.peek_token() and self.peek_token().type == TokenType.IDENTIFIER:
+                    return self.parse_min_loop()
+                else:
+                    return self.parse_builtin_call("min")
+            elif token.value == "MAX":
+                return self.parse_builtin_call("max")
+            elif token.value in ["TYPE_INT", "TYPE_REAL", "TYPE_STRING", "TYPE_BOOL", "TYPE_CHAR"]:
+                # Appel de fonction de cast utilisé comme statement: int(x); str(x); ...
+                if self.peek_token() and self.peek_token().type == TokenType.LPAREN:
+                    cast_map = {
+                        "TYPE_INT": "int",
+                        "TYPE_REAL": "float",
+                        "TYPE_STRING": "str",
+                        "TYPE_BOOL": "bool",
+                        "TYPE_CHAR": "char",
+                    }
+                    func_name = cast_map.get(token.value, "int")
+                    node = self.parse_builtin_call_expression(func_name)
+                    if self.current_token() and self.current_token().type == TokenType.SEMICOLON:
+                        self.advance()
+                    return node
             elif token.value == "ELSE_IF":
                 raise BouBelError(
                     "ELSE_IF (sinon_ken) must appear after an IF or ELSE block",
@@ -95,7 +118,7 @@ class Parser:
                 return self.parse_new()
             elif token.value == "TRY":
                 return self.parse_try()
-            elif token.value == "IMPORT":
+            elif token.value == "IMPORT":                # <- mot-clé jib
                 return self.parse_import()
             elif token.value == "BREAK":
                 self.advance()
@@ -125,7 +148,7 @@ class Parser:
                     self.advance()
                 return node
         
-        # File I/O functions - priorité
+        # File I/O functions
         if token.type == TokenType.IDENTIFIER:
             if token.value == "ikteb_fi_mlf":
                 return self.parse_file_write()
@@ -134,24 +157,20 @@ class Parser:
         
         # Identifier handling
         if token.type == TokenType.IDENTIFIER:
-            # Détection de la boucle FOR avec identifiant en premier
             if (self.peek_token() and 
                 self.peek_token().type == TokenType.KEYWORD and 
                 self.peek_token().value == "FOR"):
                 return self.parse_for_identifier_first()
             
-            # Assignment
             if self.peek_token() and self.peek_token().type == TokenType.EQUALS:
                 return self.parse_assignment()
             
-            # Compound assignment
             if self.peek_token() and self.peek_token().type in [
                 TokenType.PLUS_EQUALS, TokenType.MINUS_EQUALS,
                 TokenType.STAR_EQUALS, TokenType.SLASH_EQUALS
             ]:
                 return self.parse_compound_assignment()
             
-            # Expression statement
             node = self.safe_parse_expression()
             
             if self.current_token() and self.current_token().type == TokenType.SEMICOLON:
@@ -173,6 +192,97 @@ class Parser:
             f"Unknown statement at token {token}",
             token.line, token.column
         )
+    
+    def parse_builtin_call(self, name):
+        """Parse un appel de fonction built-in comme min(...) ou max(...)"""
+        self.advance()
+        self.expect(TokenType.LPAREN)
+        args = []
+        if self.current_token() and self.current_token().type != TokenType.RPAREN:
+            while self.current_token() and self.current_token().type != TokenType.RPAREN:
+                args.append(self.safe_parse_expression())
+                if self.current_token() and self.current_token().type == TokenType.COMMA:
+                    self.advance()
+        self.expect(TokenType.RPAREN)
+        self.expect(TokenType.SEMICOLON)
+        
+        return CallNode(name, args)
+    
+    def parse_builtin_call_expression(self, name):
+        """Parse un appel de fonction built-in dans une expression"""
+        self.advance()
+        self.expect(TokenType.LPAREN)
+        args = []
+        if self.current_token() and self.current_token().type != TokenType.RPAREN:
+            while self.current_token() and self.current_token().type != TokenType.RPAREN:
+                args.append(self.safe_parse_expression())
+                if self.current_token() and self.current_token().type == TokenType.COMMA:
+                    self.advance()
+        self.expect(TokenType.RPAREN)
+        
+        return CallNode(name, args)
+    
+    def parse_min_loop(self):
+        """Parse une boucle 'min' Exemple: min i < 5 a3mel { ... }"""
+        self.advance()
+        
+        iterator = self.expect(TokenType.IDENTIFIER).value
+        
+        op_token = self.current_token()
+        if op_token.type == TokenType.LESS:
+            op = "<"
+            self.advance()
+        elif op_token.type == TokenType.LESS_EQUAL:
+            op = "<="
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected '<' or '<=' in min loop at line {op_token.line}, col {op_token.column}",
+                op_token.line, op_token.column
+            )
+        
+        end = self.safe_parse_expression()
+        
+        if self.current_token() and self.current_token().type == TokenType.KEYWORD and self.current_token().value == "DO":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'a3mel' in min loop at line {self.current_token().line if self.current_token() else 0}",
+                self.current_token().line if self.current_token() else 0,
+                self.current_token().column if self.current_token() else 0
+            )
+        
+        self.expect(TokenType.LBRACE)
+        body = []
+        while self.current_token() and self.current_token().type != TokenType.RBRACE:
+            stmt = self.parse_statement()
+            if stmt:
+                body.append(stmt)
+        self.expect(TokenType.RBRACE)
+        
+        has_increment = False
+        for stmt in body:
+            if isinstance(stmt, AssignmentNode) and stmt.name == iterator:
+                if isinstance(stmt.value, BinOpNode):
+                    if (isinstance(stmt.value.left, IdentifierNode) and 
+                        stmt.value.left.name == iterator and 
+                        stmt.value.op == TokenType.PLUS):
+                        has_increment = True
+                        break
+        
+        if not has_increment:
+            increment = AssignmentNode(
+                iterator,
+                BinOpNode(IdentifierNode(iterator), TokenType.PLUS, NumberNode(1))
+            )
+            body.append(increment)
+        
+        while self.current_token() and self.current_token().type == TokenType.SEMICOLON:
+            self.advance()
+        
+        start = NumberNode(0)
+        
+        return ForNode(iterator, start, end, body)
     
     def safe_parse_expression(self):
         expr = self.parse_expression()
@@ -202,7 +312,7 @@ class Parser:
             self.advance()
             right = self.parse_or()
             if right is None:
-                raise BouBelError("Invalid expression: missing right operand")
+                raise BouBelError("Invalid expression: missing right operand",self.current_token().line if self.current_token() else None,  self.current_token().column if self.current_token() else None)
             left = BinOpNode(left, op, right)
         
         return left
@@ -304,11 +414,6 @@ class Parser:
                 self.advance()
                 name = self.expect(TokenType.IDENTIFIER).value
                 
-                # FIX (bug 1): si "." est suivi de "(", il s'agit d'un
-                # VÉRITABLE appel de méthode (ex: animal1.afficher(),
-                # animaux[i].afficher(), creer_chien(...).parler()) et
-                # doit produire un MethodCallNode, pas un CallNode(PropertyNode)
-                # qui n'est jamais reconnu par l'interpréteur.
                 if self.current_token() and self.current_token().type == TokenType.LPAREN:
                     self.advance()
                     args = []
@@ -319,12 +424,6 @@ class Parser:
                                 self.advance()
                     self.expect(TokenType.RPAREN)
                     
-                    # Si la base est un simple identifiant (ex: animal1),
-                    # on garde le nom (string) pour compatibilité avec
-                    # l'interpréteur existant. Sinon (ex: animaux[i], ou
-                    # le résultat d'un autre appel), on garde le noeud
-                    # AST complet ; l'interpréteur sait maintenant
-                    # l'évaluer (cf. visit_MethodCallNode corrigé).
                     if isinstance(node, IdentifierNode):
                         object_ref = node.name
                     else:
@@ -402,7 +501,25 @@ class Parser:
             self.advance()
             return IdentifierNode(token.value)
         elif token.type == TokenType.KEYWORD:
-            if token.value == "TRUE":
+            if token.value in ["TYPE_INT", "TYPE_REAL", "TYPE_STRING", "TYPE_BOOL", "TYPE_CHAR"]:
+                # Si suivi de '(', c'est un appel de fonction de cast:
+                # int(x) -> "int", real(x) -> "float", string(x) -> "str", ...
+                # Sans ce cas particulier, "int"/"real"/"string"/"bool"/"char"
+                # sont interprétés comme le mot-clé de type et l'appel de
+                # fonction est perdu (bug: int("123") renvoyait 0).
+                if self.peek_token() and self.peek_token().type == TokenType.LPAREN:
+                    cast_map = {
+                        "TYPE_INT": "int",
+                        "TYPE_REAL": "float",
+                        "TYPE_STRING": "str",
+                        "TYPE_BOOL": "bool",
+                        "TYPE_CHAR": "char",
+                    }
+                    func_name = cast_map.get(token.value, "int")
+                    return self.parse_builtin_call_expression(func_name)
+                self.advance()
+                return NumberNode(0)
+            elif token.value == "TRUE":
                 self.advance()
                 return BooleanNode(True)
             elif token.value == "FALSE":
@@ -417,6 +534,8 @@ class Parser:
                 return self.parse_this_expression()
             elif token.value == "SUPER":
                 return self.parse_super_expression()
+            elif token.value == "MIN" or token.value == "MAX":
+                return self.parse_builtin_call_expression(token.value)
             else:
                 raise BouBelError(
                     f"Unexpected keyword in expression: {token}",
@@ -447,14 +566,31 @@ class Parser:
         ))
     
     def parse_variable(self):
+        """Parse une déclaration de variable avec type optionnel"""
         self.advance()
         name = self.expect(TokenType.IDENTIFIER).value
         
         type_name = None
-        
         if self.current_token() and self.current_token().type == TokenType.COLON:
             self.advance()
-            type_name = self.expect(TokenType.IDENTIFIER).value
+            
+            token = self.current_token()
+            if token.type == TokenType.IDENTIFIER:
+                type_name = token.value
+                self.advance()
+            elif token.type == TokenType.KEYWORD and token.value in ["TYPE_INT", "TYPE_REAL", "TYPE_STRING", "TYPE_BOOL", "TYPE_CHAR"]:
+                type_name = token.value.replace("TYPE_", "").lower()
+                self.advance()
+            else:
+                raise BouBelError(
+                    f"Expected type name after ':', got {token}",
+                    token.line, token.column
+                )
+            
+            if self.current_token() and self.current_token().type == TokenType.LBRACKET:
+                self.advance()
+                self.expect(TokenType.RBRACKET)
+                type_name = type_name + "[]"
         
         self.expect(TokenType.EQUALS)
         
@@ -545,7 +681,6 @@ class Parser:
         
         self.expect(TokenType.RBRACE)
         
-        # ===== ELSE / ELSE_IF CHAIN =====
         else_body = None
         
         while self.current_token() and self.current_token().type == TokenType.KEYWORD and self.current_token().value in ["ELSE_IF", "ELSE"]:
@@ -604,16 +739,50 @@ class Parser:
         return IfNode(condition, then_body, else_body)
     
     def parse_for_keyword_first(self):
-        self.expect(TokenType.KEYWORD)
+        """
+        Parse: men i hatta 5 a3mel { ... }
+        OU: men i 1 hatta 5 a3mel { ... }
+        """
+        token = self.current_token()
+        if token and token.type == TokenType.KEYWORD and token.value == "FOR":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'men' in for loop, got {token}",
+                token.line if token else None,
+                token.column if token else None
+            )
+        
         iterator = self.expect(TokenType.IDENTIFIER).value
         
-        start = self.safe_parse_expression()
+        if (self.current_token() and 
+            self.current_token().type == TokenType.KEYWORD and 
+            self.current_token().value == "TO"):
+            start = IdentifierNode(iterator)
+        else:
+            start = self.safe_parse_expression()
         
-        self.expect(TokenType.KEYWORD)
+        token = self.current_token()
+        if token and token.type == TokenType.KEYWORD and token.value == "TO":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'hatta' or '7ata' in for loop, got {token}",
+                token.line if token else None,
+                token.column if token else None
+            )
         
         end = self.safe_parse_expression()
         
-        self.expect(TokenType.KEYWORD)
+        token = self.current_token()
+        if token and token.type == TokenType.KEYWORD and token.value == "DO":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'a3mel' in for loop, got {token}",
+                token.line if token else None,
+                token.column if token else None
+            )
         
         self.expect(TokenType.LBRACE)
         body = []
@@ -629,18 +798,51 @@ class Parser:
         return ForNode(iterator, start, end, body)
     
     def parse_for_identifier_first(self):
+        """
+        Parse: i men 1 hatta 5 a3mel { ... }
+        OU: i men hatta 5 a3mel { ... }
+        """
         iterator = self.current_token().value
         self.advance()
         
-        self.expect(TokenType.KEYWORD)
+        token = self.current_token()
+        if token and token.type == TokenType.KEYWORD and token.value == "FOR":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'men' in for loop, got {token}",
+                token.line if token else None,
+                token.column if token else None
+            )
         
-        start = self.safe_parse_expression()
+        if (self.current_token() and 
+            self.current_token().type == TokenType.KEYWORD and 
+            self.current_token().value == "TO"):
+            start = IdentifierNode(iterator)
+        else:
+            start = self.safe_parse_expression()
         
-        self.expect(TokenType.KEYWORD)
+        token = self.current_token()
+        if token and token.type == TokenType.KEYWORD and token.value == "TO":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'hatta' or '7ata' in for loop, got {token}",
+                token.line if token else None,
+                token.column if token else None
+            )
         
         end = self.safe_parse_expression()
         
-        self.expect(TokenType.KEYWORD)
+        token = self.current_token()
+        if token and token.type == TokenType.KEYWORD and token.value == "DO":
+            self.advance()
+        else:
+            raise BouBelError(
+                f"Expected 'a3mel' in for loop, got {token}",
+                token.line if token else None,
+                token.column if token else None
+            )
         
         self.expect(TokenType.LBRACE)
         body = []
@@ -683,17 +885,47 @@ class Parser:
     def parse_function(self):
         self.advance()
         name = self.expect(TokenType.IDENTIFIER).value
+        
         self.expect(TokenType.LPAREN)
         
         params = []
         if self.current_token() and self.current_token().type != TokenType.RPAREN:
             while self.current_token() and self.current_token().type != TokenType.RPAREN:
-                param = self.expect(TokenType.IDENTIFIER).value
-                params.append(param)
+                param_name = self.expect(TokenType.IDENTIFIER).value
+                
+                if self.current_token() and self.current_token().type == TokenType.COLON:
+                    self.advance()
+                    token = self.current_token()
+                    if token.type == TokenType.IDENTIFIER:
+                        self.advance()
+                    elif token.type == TokenType.KEYWORD and token.value in ["TYPE_INT", "TYPE_REAL", "TYPE_STRING", "TYPE_BOOL", "TYPE_CHAR"]:
+                        self.advance()
+                    else:
+                        raise BouBelError(
+                            f"Expected type name after ':', got {token}",
+                            token.line, token.column
+                        )
+                
+                params.append(param_name)
+                
                 if self.current_token() and self.current_token().type == TokenType.COMMA:
                     self.advance()
         
         self.expect(TokenType.RPAREN)
+        
+        if self.current_token() and self.current_token().type == TokenType.COLON:
+            self.advance()
+            token = self.current_token()
+            if token.type == TokenType.IDENTIFIER:
+                self.advance()
+            elif token.type == TokenType.KEYWORD and token.value in ["TYPE_INT", "TYPE_REAL", "TYPE_STRING", "TYPE_BOOL", "TYPE_CHAR"]:
+                self.advance()
+            else:
+                raise BouBelError(
+                    f"Expected return type after ':', got {token}",
+                    token.line, token.column
+                )
+        
         self.expect(TokenType.LBRACE)
         
         body = []

@@ -20,6 +20,27 @@ class Lexer:
             if char == '#':
                 self.skip_comment()
                 continue
+            # ===== GESTION DES COMMENTAIRES DE TYPE C =====
+            if char == '/':
+                if self.peek() == '/':
+                    # Commentaire ligne //
+                    self.advance()
+                    self.advance()
+                    while self.position < len(self.code) and self.current_char() != '\n':
+                        self.advance()
+                    continue
+                elif self.peek() == '*':
+                    # Commentaire bloc /* ... */
+                    self.advance()
+                    self.advance()
+                    while self.position < len(self.code):
+                        if self.current_char() == '*' and self.peek() == '/':
+                            self.advance()
+                            self.advance()
+                            break
+                        self.advance()
+                    continue
+            # ================================================
             if char.isdigit():
                 if self.is_digit_led_word():
                     self.read_identifier()
@@ -63,6 +84,7 @@ class Lexer:
         self.position += 1
     
     def skip_comment(self):
+        """Ignore les commentaires commençant par # (jusqu'à la fin de ligne)."""
         while self.position < len(self.code) and self.current_char() != '\n':
             self.advance()
     

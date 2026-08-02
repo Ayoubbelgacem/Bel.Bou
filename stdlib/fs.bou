@@ -1,0 +1,22 @@
+// fs.bou - Opérations avancées sur les fichiers
+
+// Copier un fichier
+fonction copier(source, dest) {
+    khdem contenu = iqra_mlf(source);
+    ikteb_fi_mlf(dest, contenu);
+    retourner s7i7;
+}
+
+// Supprimer un fichier
+fonction supprimer(fichier) {
+    // Nécessite une fonction C : boubel_file_delete()
+    // Pour linstant, on simule
+    retourner ghalet;
+}
+
+// Lire le contenu dun rpertoire (liste des noms)
+fonction lister(repertoire) {
+    // Nécessite une fonction C : boubel_list_dir()
+    // Pour linstant, on retourne un tableau vide
+    retourner [];
+}

@@ -1,0 +1,7 @@
+jib "hisab";
+jib "nass";
+jib "qayma";
+ikteb(pi());
+ikteb(kbir("test"));
+khdem a = [1,2,3];
+ikteb(len(a));

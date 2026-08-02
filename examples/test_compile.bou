@@ -1,0 +1,311 @@
+# ============================================
+# BOU.BEL - TEST COMPILATEUR NATIF
+# Test de compilation LLVM
+# ============================================
+
+ikteb("========================================");
+ikteb("  🐪 BOU.BEL - TEST COMPILATEUR");
+ikteb("========================================");
+ikteb("");
+
+# ============================================
+# 1. VARIABLES
+# ============================================
+ikteb("--- 1. VARIABLES ---");
+
+khdem x = 10;
+khdem y = 20;
+khdem z = x + y;
+
+ikteb("x = ");
+ikteb(x);
+ikteb("\ny = ");
+ikteb(y);
+ikteb("\nz = ");
+ikteb(z);
+ikteb("\n");
+
+# ============================================
+# 2. ARITHMÉTIQUE
+# ============================================
+ikteb("--- 2. ARITHMÉTIQUE ---");
+
+khdem a = 15;
+khdem b = 7;
+
+ikteb("a = ");
+ikteb(a);
+ikteb(", b = ");
+ikteb(b);
+ikteb("\n");
+
+ikteb("a + b = ");
+ikteb(a + b);
+ikteb("\n");
+
+ikteb("a - b = ");
+ikteb(a - b);
+ikteb("\n");
+
+ikteb("a * b = ");
+ikteb(a * b);
+ikteb("\n");
+
+ikteb("a / b = ");
+ikteb(a / b);
+ikteb("\n");
+
+ikteb("a % b = ");
+ikteb(a % b);
+ikteb("\n");
+
+# ============================================
+# 3. COMPARAISONS
+# ============================================
+ikteb("--- 3. COMPARAISONS ---");
+
+khdem p = 10;
+khdem q = 20;
+
+ikteb("p = ");
+ikteb(p);
+ikteb(", q = ");
+ikteb(q);
+ikteb("\n");
+
+ikteb("p == q: ");
+ikteb(p == q);
+ikteb("\n");
+
+ikteb("p != q: ");
+ikteb(p != q);
+ikteb("\n");
+
+ikteb("p > q: ");
+ikteb(p > q);
+ikteb("\n");
+
+ikteb("p < q: ");
+ikteb(p < q);
+ikteb("\n");
+
+ikteb("p >= q: ");
+ikteb(p >= q);
+ikteb("\n");
+
+ikteb("p <= q: ");
+ikteb(p <= q);
+ikteb("\n");
+
+# ============================================
+# 4. CONDITIONS (IF/ELSE)
+# ============================================
+ikteb("--- 4. CONDITIONS ---");
+
+khdem score = 85;
+
+ken score >= 90 a3mel {
+    ikteb("Score: Excellent!\n");
+} sinon_ken score >= 75 a3mel {
+    ikteb("Score: Bien!\n");
+} sinon_ken score >= 60 a3mel {
+    ikteb("Score: Passable!\n");
+} sinon {
+    ikteb("Score: Échec!\n");
+}
+
+khdem age = 17;
+ken age >= 18 a3mel {
+    ikteb("Vous êtes majeur.\n");
+} sinon {
+    ikteb("Vous êtes mineur.\n");
+}
+
+# ============================================
+# 5. BOUCLES FOR
+# ============================================
+ikteb("--- 5. BOUCLES FOR ---");
+
+ikteb("Comptage de 1 à 5:\n");
+i men 1 7ata 5 a3mel {
+    ikteb(i);
+    ikteb(" ");
+}
+ikteb("\n");
+
+ikteb("Table de multiplication de 3:\n");
+i men 1 7ata 10 a3mel {
+    ikteb("3 × ");
+    ikteb(i);
+    ikteb(" = ");
+    ikteb(3 * i);
+    ikteb("\n");
+}
+
+# ============================================
+# 6. BOUCLES WHILE
+# ============================================
+ikteb("--- 6. BOUCLES WHILE ---");
+
+khdem compteur = 0;
+tawa compteur < 5 a3mel {
+    ikteb("Compteur: ");
+    ikteb(compteur);
+    ikteb("\n");
+    compteur = compteur + 1;
+}
+
+# ============================================
+# 7. FONCTIONS
+# ============================================
+ikteb("--- 7. FONCTIONS ---");
+
+dallel addition(a, b) {
+    rejje a + b;
+}
+
+khdem resultat = addition(15, 30);
+ikteb("15 + 30 = ");
+ikteb(resultat);
+ikteb("\n");
+
+dallel factorielle(n) {
+    ken n <= 1 a3mel {
+        rejje 1;
+    } sinon {
+        rejje n * factorielle(n - 1);
+    }
+}
+
+ikteb("Factorielle de 5 = ");
+ikteb(factorielle(5));
+ikteb("\n");
+
+dallel est_pair(n) {
+    ken n % 2 == 0 a3mel {
+        rejje 1;
+    } sinon {
+        rejje 0;
+    }
+}
+
+ikteb("7 est pair? ");
+ikteb(est_pair(7));
+ikteb("\n");
+
+ikteb("8 est pair? ");
+ikteb(est_pair(8));
+ikteb("\n");
+
+# ============================================
+# 8. FONCTIONS AVEC MULTIPLES PARAMÈTRES
+# ============================================
+ikteb("--- 8. FONCTIONS MULTIPLES ---");
+
+dallel max3(a, b, c) {
+    khdem max = a;
+    ken b > max a3mel {
+        max = b;
+    }
+    ken c > max a3mel {
+        max = c;
+    }
+    rejje max;
+}
+
+ikteb("Max de 10, 20, 30 = ");
+ikteb(max3(10, 20, 30));
+ikteb("\n");
+
+dallel moyenne3(a, b, c) {
+    rejje (a + b + c) / 3;
+}
+
+ikteb("Moyenne de 10, 20, 30 = ");
+ikteb(moyenne3(10, 20, 30));
+ikteb("\n");
+
+# ============================================
+# 9. BOUCLES IMBRIQUÉES
+# ============================================
+ikteb("--- 9. BOUCLES IMBRIQUÉES ---");
+
+ikteb("Table de multiplication (5x5):\n");
+i men 1 7ata 5 a3mel {
+    j men 1 7ata 5 a3mel {
+        ikteb(i * j);
+        ikteb(" ");
+    }
+    ikteb("\n");
+}
+
+# ============================================
+# 10. RÉCURSIVITÉ MULTIPLE
+# ============================================
+ikteb("--- 10. RÉCURSIVITÉ ---");
+
+dallel fibonacci(n) {
+    ken n <= 1 a3mel {
+        rejje n;
+    } sinon {
+        rejje fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+
+ikteb("Fibonacci(0) = ");
+ikteb(fibonacci(0));
+ikteb("\n");
+
+ikteb("Fibonacci(1) = ");
+ikteb(fibonacci(1));
+ikteb("\n");
+
+ikteb("Fibonacci(5) = ");
+ikteb(fibonacci(5));
+ikteb("\n");
+
+ikteb("Fibonacci(10) = ");
+ikteb(fibonacci(10));
+ikteb("\n");
+
+# ============================================
+# 11. PROGRAMME FINAL
+# ============================================
+ikteb("--- 11. RÉSULTAT FINAL ---");
+
+khdem notes = [14, 16, 18, 12, 15, 17, 19, 13, 16, 15];
+khdem sum = 0;
+
+i men 0 7ata len(notes)-1 a3mel {
+    sum = sum + notes[i];
+}
+
+khdem moyenne = sum / len(notes);
+
+ikteb("Notes: ");
+ikteb(notes);
+ikteb("\n");
+
+ikteb("Somme: ");
+ikteb(sum);
+ikteb("\n");
+
+ikteb("Moyenne: ");
+ikteb(moyenne);
+ikteb("\n");
+
+ken moyenne >= 15 a3mel {
+    ikteb("✅ Félicitations! Excellente moyenne!\n");
+} sinon_ken moyenne >= 12 a3mel {
+    ikteb("👍 Bien! Moyenne satisfaisante.\n");
+} sinon {
+    ikteb("📚 Travaillez encore plus fort!\n");
+}
+
+# ============================================
+# FIN DU PROGRAMME
+# ============================================
+ikteb("\n");
+ikteb("========================================\n");
+ikteb("  🎉 TEST COMPILATEUR TERMINÉ AVEC SUCCÈS!\n");
+ikteb("========================================\n");

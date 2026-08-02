@@ -1,0 +1,81 @@
+{
+    "Déclaration de variable": {
+        "prefix": "khdem",
+        "body": [
+            "khdem ${1:nom} = ${2:valeur};"
+        ],
+        "description": "Déclare une variable"
+    },
+    "Fonction": {
+        "prefix": "dallel",
+        "body": [
+            "dallel ${1:nom}(${2:param}) {",
+            "\t${3:// corps de la fonction}",
+            "}"
+        ],
+        "description": "Définit une fonction"
+    },
+    "Condition if": {
+        "prefix": "ken",
+        "body": [
+            "ken ${1:condition} a3mel {",
+            "\t${2:// corps}",
+            "}"
+        ],
+        "description": "Structure conditionnelle"
+    },
+    "Boucle for": {
+        "prefix": "men",
+        "body": [
+            "${1:i} men ${2:0} 7ata ${3:10} a3mel {",
+            "\t${4:// corps}",
+            "}"
+        ],
+        "description": "Boucle for"
+    },
+    "Boucle while": {
+        "prefix": "tawa",
+        "body": [
+            "tawa ${1:condition} a3mel {",
+            "\t${2:// corps}",
+            "}"
+        ],
+        "description": "Boucle while"
+    },
+    "Classe": {
+        "prefix": "class",
+        "body": [
+            "class ${1:NomClasse} {",
+            "\t${2:// propriétés et méthodes}",
+            "}"
+        ],
+        "description": "Définit une classe"
+    },
+    "Try/Catch/Finally": {
+        "prefix": "7awel",
+        "body": [
+            "7awel {",
+            "\t${1:// code}",
+            "} ebsed(${2:e}) {",
+            "\t${3:// gestion d'erreur}",
+            "} akhir {",
+            "\t${4:// finally}",
+            "}"
+        ],
+        "description": "Gestion d'exceptions"
+    },
+    "Écrire dans un fichier": {
+        "prefix": "ikteb_fi_mlf",
+        "body": [
+            "ikteb_fi_mlf(\"${1:filename.txt}\", \"${2:contenu}\");"
+        ],
+        "description": "Écrit dans un fichier"
+    },
+    "Lire un fichier": {
+        "prefix": "iqra_mlf",
+        "body": [
+            "khdem ${1:contenu} = iqra_mlf(\"${2:filename.txt}\");"
+        ],
+        "description": "Lit un fichier"
+    }
+}

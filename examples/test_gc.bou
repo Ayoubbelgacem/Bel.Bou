@@ -1,0 +1,99 @@
+// test_gc.bou - Test du Garbage Collector (comptage de références)
+jib "qayma";
+
+ikteb("========================================");
+ikteb("  🧹 TEST GARBAGE COLLECTOR");
+ikteb("========================================");
+ikteb("");
+
+// ---------- Définition d'une classe simple ----------
+class Test {
+    hetha.nom = "";
+    
+    jdid(n) {
+        hetha.nom = n;
+        ikteb("  🔵 Création de '" + n + "'");
+    }
+    
+    dallel parler() {
+        ikteb("  🗣️ Je suis " + hetha.nom);
+    }
+}
+
+// ---------- 1. Création et réaffectation ----------
+ikteb("--- 1. Création et réaffectation ---");
+khdem obj1 = new Test("A");
+obj1.parler();
+
+// Réaffectation : l'ancien objet (A) devrait être libéré
+khdem obj1 = new Test("B");
+obj1.parler();
+ikteb("");
+
+// ---------- 2. Objets dans une fonction (portée locale) ----------
+ikteb("--- 2. Objets locaux (sortie de fonction) ---");
+dallel test_local() {
+    khdem local1 = new Test("Local1");
+    khdem local2 = new Test("Local2");
+    local1.parler();
+    local2.parler();
+    // En sortie, local1 et local2 devraient être libérés
+    rejje 0;
+}
+test_local();
+ikteb("Fin de la fonction : les objets locaux sont libérés (normalement)");
+ikteb("");
+
+// ---------- 3. Tableau d'objets ----------
+ikteb("--- 3. Tableau d'objets ---");
+khdem tab = [];
+zid(tab, new Test("T1"));
+zid(tab, new Test("T2"));
+zid(tab, new Test("T3"));
+ikteb("Taille du tableau : " + len(tab));
+ikteb("Contenu du tableau : " + tab);
+ikteb("");
+
+// ---------- 4. Réaffectation du tableau ----------
+ikteb("--- 4. Réaffectation du tableau ---");
+khdem tab = [];
+ikteb("Tableau réinitialisé. Les anciens objets devraient être libérés.");
+ikteb("");
+
+// ---------- 5. Fonction qui retourne un objet ----------
+ikteb("--- 5. Retour d'objet depuis une fonction ---");
+dallel creer_objet(nom) {
+    rejje new Test(nom);
+}
+khdem obj2 = creer_objet("Retourne");
+obj2.parler();
+
+khdem obj2 = new Test("Autre");
+obj2.parler();
+ikteb("");
+
+// ---------- 6. Affectation dans une boucle ----------
+ikteb("--- 6. Boucle de création / libération ---");
+men i 0 7ata 5 a3mel {
+    khdem temp = new Test("Temp_" + str(i));
+    temp.parler();
+    // À chaque itération, l'objet précédent est libéré
+}
+ikteb("");
+
+// ---------- 7. Objet dans une variable globale ----------
+ikteb("--- 7. Variable globale persistante ---");
+khdem global = new Test("Global");
+global.parler();
+ikteb("");
+
+// ---------- 8. Réaffectation de la variable globale ----------
+ikteb("--- 8. Réaffectation de la variable globale ---");
+khdem global = new Test("Global2");
+global.parler();
+ikteb("");
+
+// ---------- FIN ----------
+ikteb("========================================");
+ikteb("  ✅ TEST GC TERMINÉ AVEC SUCCÈS");
+ikteb("========================================");

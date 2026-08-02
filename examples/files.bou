@@ -1,0 +1,14 @@
+ikteb_fi_mlf("test_data.txt", "Bienvenue dans Bou.Bel!\nCeci est un test complet.");
+ikteb("✅ Fichier écrit avec succès!");
+
+khdem contenu = iqra_mlf("test_data.txt");
+ikteb("Contenu du fichier:");
+ikteb(contenu);
+
+khdem texte2 = "Nom: Ayoub\nAge: 25\nVille: Tunis";
+ikteb_fi_mlf("info.txt", texte2);
+ikteb("✅ Informations sauvegardées!");
+
+khdem info = iqra_mlf("info.txt");
+ikteb("Informations lues:");
+ikteb(info);

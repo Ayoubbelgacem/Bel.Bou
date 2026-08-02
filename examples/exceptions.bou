@@ -1,0 +1,40 @@
+ikteb("--- TRY/CATCH/FINALLY ---");
+
+7awel {
+    ikteb("Tentative 1: Division normale...");
+    khdem result1 = 10 / 2;
+    ikteb("Résultat: " + result1);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 1)");
+}
+
+7awel {
+    ikteb("");
+    ikteb("Tentative 2: Division par zéro...");
+    khdem result2 = 10 / 0;
+    ikteb("Résultat: " + result2);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 2)");
+}
+
+dallel diviser(a, b) {
+    ken b == 0 a3mel {
+        t7at "Division par zéro!";
+    }
+    rejje a / b;
+}
+
+7awel {
+    ikteb("");
+    ikteb("Tentative 3: Appel de diviser(10, 0)...");
+    khdem result3 = diviser(10, 0);
+    ikteb("Résultat: " + result3);
+} ebsed(e) {
+    ikteb("❌ Erreur attrapée: " + e);
+} akhir {
+    ikteb("✅ Finally exécuté (Tentative 3)");
+}

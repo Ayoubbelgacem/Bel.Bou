@@ -1,0 +1,22 @@
+// math.bou - Fonctions mathématiques avancées
+
+fonction sin(x) {
+    // Séries de Taylor (simplifiées)
+    // Pour une vraie implémentation, utiliser une fonction C
+    retourner x - (x^3)/6 + (x^5)/120 - (x^7)/5040;
+}
+
+fonction cos(x) {
+    retourner 1 - (x^2)/2 + (x^4)/24 - (x^6)/720;
+}
+
+fonction log(x) {
+    // Logarithme népérien (approximation)
+    // Nécessite une fonction C
+    retourner 0;
+}
+
+fonction exp(x) {
+    // Exponentielle (approximation)
+    retourner 1 + x + (x^2)/2 + (x^3)/6 + (x^4)/24;
+}

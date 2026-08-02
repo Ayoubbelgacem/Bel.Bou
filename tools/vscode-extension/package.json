@@ -1,0 +1,40 @@
+{
+    "name": "boubel",
+    "displayName": "Bou.Bel Language",
+    "description": "Syntax highlighting and language support for Bou.Bel programming language",
+    "version": "1.0.0",
+    "publisher": "boubel",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/username/Bou.Bel"
+    },
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "boubel",
+                "aliases": ["Bou.Bel", "boubel"],
+                "extensions": [".bou"],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "boubel",
+                "scopeName": "source.boubel",
+                "path": "./syntaxes/boubel.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "boubel",
+                "path": "./snippets/boubel.json"
+            }
+        ]
+    }
+}

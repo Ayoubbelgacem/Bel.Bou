@@ -1,0 +1,60 @@
+class Animal {
+    hetha.nom = "Inconnu";
+    hetha.age = 0;
+    
+    jdid(n, a) {
+        hetha.nom = n;
+        hetha.age = a;
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " fait un bruit.");
+    }
+    
+    dallel afficher() {
+        ikteb("Nom: " + hetha.nom + ", Age: " + hetha.age);
+    }
+}
+
+class Chien toroth Animal {
+    hetha.race = "Inconnue";
+    
+    jdid(n, a, r) {
+        super(n, a);
+        hetha.race = r;
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " dit: Woof Woof! 🐶");
+    }
+    
+    dallel afficher() {
+        ikteb("🐕 Chien - Nom: " + hetha.nom + ", Age: " + hetha.age + ", Race: " + hetha.race);
+    }
+}
+
+class Chat toroth Animal {
+    jdid(n, a) {
+        super(n, a);
+    }
+    
+    dallel parler() {
+        ikteb(hetha.nom + " dit: Miaou! 🐱");
+    }
+    
+    dallel afficher() {
+        ikteb("🐱 Chat - Nom: " + hetha.nom + ", Age: " + hetha.age);
+    }
+}
+
+khdem animal = new Animal("Max", 3);
+animal.afficher();
+animal.parler();
+
+khdem chien = new Chien("Rex", 5, "Berger Allemand");
+chien.afficher();
+chien.parler();
+
+khdem chat = new Chat("Mimi", 2);
+chat.afficher();
+chat.parler();

@@ -1,0 +1,22 @@
+# examples/test_native.bou
+khdem x = 10;
+khdem y = 20;
+khdem z = x + y;
+
+ikteb("x = ");
+ikteb(x);
+ikteb("\ny = ");
+ikteb(y);
+ikteb("\nz = ");
+ikteb(z);
+
+dallel factorial(n) {
+    ken n <= 1 a3mel {
+        rejje 1;
+    } sinon {
+        rejje n * factorial(n - 1);
+    }
+}
+
+ikteb("\nFactorial 5 = ");
+ikteb(factorial(5));

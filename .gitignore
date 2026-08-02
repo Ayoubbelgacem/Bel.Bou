@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Compiled files
+*.exe
+*.dll
+*.o
+
+# Test outputs
+out_*
+ir.log
+trace.log
+vm_trace.log
+debug.log
+interpreter_debug.log
+
+# Virtual environments
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+**/.metadata
+
+# Compiled libraries
+*.a
+*.so
+*.lib
+
+# VS Code extension packages (اختياري)
+*.vsix

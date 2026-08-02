@@ -1,0 +1,30 @@
+khdem notes = [15, 18, 12, 20, 9, 14];
+
+ikteb("Notes: " + notes);
+ikteb("Première note: " + notes[0]);
+ikteb("Dernière note: " + notes[5]);
+ikteb("Nombre de notes: " + len(notes));
+
+notes[2] = 16;
+ikteb("Note modifiée (index 2): " + notes[2]);
+
+ikteb("Toutes les notes:");
+i men 0 7ata 5 a3mel {
+    ikteb("  Notes[" + i + "] = " + notes[i]);
+}
+
+khdem nombres = [5, 3, 8, 1, 9, 2];
+ikteb("");
+ikteb("Nombres: " + nombres);
+ikteb("Somme: " + sum(nombres));
+ikteb("Max: " + max(nombres));
+ikteb("Min: " + min(nombres));
+ikteb("Trié: " + sorted(nombres));
+
+khdem fruits = ["pomme", "banane", "orange"];
+append(fruits, "kiwi");
+ikteb("Après append: " + fruits);
+
+khdem dernier = pop(fruits);
+ikteb("Dernier élément: " + dernier);
+ikteb("Après pop: " + fruits);

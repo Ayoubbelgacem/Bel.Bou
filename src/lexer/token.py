@@ -62,55 +62,45 @@ class Token:
     def __str__(self):
         return f"<{self.type.value}: '{self.value}'>"
 
-# ALL Tunisian Arabic keywords in Latin script
+# Tunisian Arabic keywords
 KEYWORDS = {
-    # Variables & I/O
     "khdem": "VARIABLE",
     "ikteb": "PRINT",
     "iqra": "INPUT",
-    
-    # Conditions
     "ken": "IF",
     "sinon": "ELSE",
     "sinon_ken": "ELSE_IF",
-    
-    # Logical operators
     "and": "AND",
     "or": "OR",
     "not": "NOT",
-    
-    # Loops
+    "min": "MIN",
     "men": "FOR",
+    "hatta": "TO",
     "7ata": "TO",
     "a3mel": "DO",
     "tawa": "WHILE",
-    
-    # Functions
-    "dallel": "FUNCTION",
-    "rejje": "RETURN",
-    
-    # Classes & OOP
+    "dallel": "FUNCTION",          # version tunisienne
+    "fonction": "FUNCTION",        # version francisée
+    "rejje": "RETURN",             # version tunisienne
+    "retourner": "RETURN",         # version francisée
     "class": "CLASS",
     "toroth": "INHERITS",
     "jdid": "NEW",
     "new": "NEW",
     "hetha": "THIS",
     "super": "SUPER",
-    
-    # Booleans
     "s7i7": "TRUE",
     "ghalet": "FALSE",
     "null": "NULL",
-    
-    # Modules
-    "import": "IMPORT",
-    
-    # Exceptions
+    "jib": "IMPORT",               # import
     "7awel": "TRY",
     "ebsed": "CATCH",
     "akhir": "FINALLY",
-    
-    # Other
     "wakaf": "BREAK",
     "tkhata": "CONTINUE",
+    "int": "TYPE_INT",
+    "real": "TYPE_REAL",
+    "string": "TYPE_STRING",
+    "bool": "TYPE_BOOL",
+    "char": "TYPE_CHAR",
 }

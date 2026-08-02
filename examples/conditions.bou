@@ -1,0 +1,18 @@
+khdem score = 85;
+
+ken score >= 90 a3mel {
+    ikteb("Score: " + score + " → Excellent!");
+} sinon_ken score >= 75 a3mel {
+    ikteb("Score: " + score + " → Bien!");
+} sinon_ken score >= 60 a3mel {
+    ikteb("Score: " + score + " → Passable!");
+} sinon {
+    ikteb("Score: " + score + " → Échec!");
+}
+
+khdem age = 17;
+ken age >= 18 a3mel {
+    ikteb("Vous êtes majeur.");
+} sinon {
+    ikteb("Vous êtes mineur.");
+}

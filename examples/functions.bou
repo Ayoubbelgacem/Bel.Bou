@@ -1,0 +1,34 @@
+dallel addition(a, b) {
+    rejje a + b;
+}
+
+dallel est_pair(n) {
+    ken n % 2 == 0 a3mel {
+        rejje s7i7;
+    } sinon {
+        rejje ghalet;
+    }
+}
+
+dallel factorielle(n) {
+    ken n <= 1 a3mel {
+        rejje 1;
+    } sinon {
+        rejje n * factorielle(n - 1);
+    }
+}
+
+dallel moyenne(a, b, c) {
+    rejje (a + b + c) / 3;
+}
+
+khdem resultat = addition(15, 30);
+ikteb("15 + 30 = " + resultat);
+
+ikteb("7 est pair? " + est_pair(7));
+ikteb("8 est pair? " + est_pair(8));
+
+ikteb("Factorielle de 5 = " + factorielle(5));
+ikteb("Factorielle de 7 = " + factorielle(7));
+
+ikteb("Moyenne de 10, 20, 30 = " + moyenne(10, 20, 30));

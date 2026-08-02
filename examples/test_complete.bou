@@ -1,64 +1,392 @@
-khdem notes = [12, 15, 18, 20, 9];
-ikteb("First note: " + notes[0]);
+# ============================================
+# BOU.BEL - TEST COMPLET (version LLVM)
+# ============================================
 
-khdem x = 10;
-khdem y = 20;
-ikteb("Sum: " + (x + y));
+ikteb("========================================");
+ikteb("  🐪 BOU.BEL - TEST COMPLET");
+ikteb("========================================");
+ikteb("");
 
-ken x > y a3mel {
-    ikteb("x is bigger");
+# ============================================
+# 1. VARIABLES
+# ============================================
+ikteb("--- 1. VARIABLES ---");
+khdem nom = "Ayoub";
+khdem age = 25;
+khdem taille = 1.80;
+khdem actif = s7i7;
+khdem lettre = 'A';
+ikteb("Nom: " + nom);
+ikteb("Age: " + age);
+ikteb("Taille: " + taille);
+ikteb("Actif: " + actif);
+ikteb("Lettre: " + lettre);
+ikteb("");
+
+# ============================================
+# 2. ARRAYS
+# ============================================
+ikteb("--- 2. ARRAYS ---");
+khdem notes = [15, 18, 12, 20, 9, 14];
+ikteb("Notes: " + notes);
+ikteb("Première: " + notes[0]);
+ikteb("Dernière: " + notes[5]);
+ikteb("Nombre: " + len(notes));
+notes[2] = 16;
+ikteb("Toutes les notes:");
+men i 0 7ata 5 a3mel {
+    ikteb("  Notes[" + i + "] = " + notes[i]);
+}
+ikteb("");
+
+# ============================================
+# 3. CHAÎNES
+# ============================================
+ikteb("--- 3. CHAÎNES ---");
+khdem prenom = "Mohamed";
+khdem nom_famille = "Ben Ali";
+khdem nom_complet = prenom + " " + nom_famille;
+ikteb("Prénom: " + prenom);
+ikteb("Nom: " + nom_famille);
+ikteb("Nom complet: " + nom_complet);
+ikteb("Longueur: " + len(nom_complet));
+ikteb("");
+
+# ============================================
+# 4. CONDITIONS
+# ============================================
+ikteb("--- 4. CONDITIONS ---");
+khdem score = 85;
+ken score >= 90 a3mel {
+    ikteb("Score: " + score + " → Excellent!");
+} sinon_ken score >= 75 a3mel {
+    ikteb("Score: " + score + " → Bien!");
+} sinon_ken score >= 60 a3mel {
+    ikteb("Score: " + score + " → Passable!");
 } sinon {
-    ikteb("y is bigger");
+    ikteb("Score: " + score + " → Échec!");
 }
-
-ikteb("For loop:");
-men i 1 7ata 3 a3mel {
-    ikteb("  Counter: " + i);
+khdem age_personne = 17;
+ken age_personne >= 18 a3mel {
+    ikteb("Vous êtes majeur.");
+} sinon {
+    ikteb("Vous êtes mineur.");
 }
+ikteb("");
 
-dallel add(a, b) {
-    rejje a + b;
+# ============================================
+# 5. BOUCLES FOR
+# ============================================
+ikteb("--- 5. BOUCLES FOR ---");
+ikteb("Comptage 1 à 5:");
+men i 1 7ata 5 a3mel { ikteb("  " + i); }
+ikteb("Table de 3:");
+men i 1 7ata 10 a3mel {
+    ikteb("  3 × " + i + " = " + (3 * i));
 }
-khdem result = add(15, 25);
-ikteb("Add result: " + result);
-
-khdem counter = 0;
-tawa counter < 3 a3mel {
-    ikteb("While loop: " + counter);
-    counter = counter + 1;
+ikteb("Pairs de 1 à 10:");
+men i 1 7ata 10 a3mel {
+    ken i % 2 == 0 a3mel { ikteb("  " + i + " est pair"); }
 }
+ikteb("");
 
-ikteb_fi_mlf("data.txt", "Hello from Bou.Bel!");
-m7twa = iqra_mlf("data.txt");
-ikteb("File content: " + m7twa);
+# ============================================
+# 6. WHILE
+# ============================================
+ikteb("--- 6. WHILE ---");
+khdem compteur = 0;
+tawa compteur < 5 a3mel {
+    ikteb("Compteur: " + compteur);
+    compteur = compteur + 1;
+}
+khdem x = 10;
+tawa x > 0 a3mel {
+    ikteb("x = " + x);
+    x = x - 2;
+}
+ikteb("");
 
+# ============================================
+# 7. FONCTIONS
+# ============================================
+ikteb("--- 7. FONCTIONS ---");
+dallel addition(a, b) { rejje a + b; }
+ikteb("15 + 30 = " + addition(15, 30));
+
+dallel est_pair(n) {
+    ken n % 2 == 0 a3mel { rejje s7i7; }
+    rejje ghalet;
+}
+ikteb("7 est pair? " + est_pair(7));
+ikteb("8 est pair? " + est_pair(8));
+
+dallel factorielle(n) {
+    ken n <= 1 a3mel { rejje 1; }
+    rejje n * factorielle(n - 1);
+}
+ikteb("Factorielle de 5 = " + factorielle(5));
+ikteb("Factorielle de 7 = " + factorielle(7));
+
+dallel moyenne(a, b, c) { rejje (a + b + c) / 3; }
+ikteb("Moyenne de 10,20,30 = " + moyenne(10,20,30));
+ikteb("");
+
+# ============================================
+# 8. BUILT-IN
+# ============================================
+ikteb("--- 8. BUILT-IN ---");
+khdem texte = "Bonjour Bou.Bel";
+ikteb("Texte: " + texte);
+ikteb("Longueur: " + len(texte));
+ikteb("Type: " + type(texte));
+khdem nombre = "123";
+ikteb("int('123') = " + int(nombre));
+ikteb("");
+
+# ============================================
+# 9. CLASSES ET OOP
+# ============================================
+ikteb("--- 9. CLASSES ET OOP ---");
 class Animal {
-    hetha.name = "Unknown";
-    dallel set_name(n) {
-        hetha.name = n;
-    }
+    hetha.nom = "Inconnu";
+    hetha.age = 0;
+    jdid(n, a) { hetha.nom = n; hetha.age = a; }
+    dallel parler() { ikteb(hetha.nom + " fait un bruit."); }
+    dallel afficher() { ikteb("Nom: " + hetha.nom + ", Age: " + hetha.age); }
 }
+khdem animal1 = new Animal("Max", 3);
+animal1.afficher();
+animal1.parler();
 
-class Dog toroth Animal {
-    jdid(name) {
-        hetha.name = name;
-    }
-    dallel bark() {
-        ikteb(hetha.name + " says: Woof!");
-    }
+class Chien toroth Animal {
+    hetha.race = "Inconnue";
+    jdid(n, a, r) { super(n, a); hetha.race = r; }
+    dallel parler() { ikteb(hetha.nom + " dit: Woof Woof! 🐶"); }
+    dallel afficher() { ikteb("🐕 Chien - Nom: " + hetha.nom + ", Age: " + hetha.age + ", Race: " + hetha.race); }
 }
+khdem chien1 = new Chien("Rex", 5, "Berger Allemand");
+chien1.afficher();
+chien1.parler();
 
-khdem dog = new Dog("Rex");
-dog.bark();
+class Chat toroth Animal {
+    jdid(n, a) { super(n, a); }
+    dallel parler() { ikteb(hetha.nom + " dit: Miaou! 🐱"); }
+    dallel afficher() { ikteb("🐱 Chat - Nom: " + hetha.nom + ", Age: " + hetha.age); }
+}
+khdem chat1 = new Chat("Mimi", 2);
+chat1.afficher();
+chat1.parler();
+ikteb("");
+
+# ============================================
+# 10. HÉRITAGE
+# ============================================
+ikteb("--- 10. HÉRITAGE ---");
+class Oiseau toroth Animal {
+    hetha.couleur = "Bleu";
+    jdid(n, a, c) { super(n, a); hetha.couleur = c; }
+    dallel parler() { ikteb(hetha.nom + " dit: Cui Cui! 🐦"); }
+    dallel voler() { ikteb(hetha.nom + " vole!"); }
+    dallel afficher() { ikteb("🐦 Oiseau - Nom: " + hetha.nom + ", Couleur: " + hetha.couleur); }
+}
+khdem oiseau1 = new Oiseau("Pip", 1, "Jaune");
+oiseau1.afficher();
+oiseau1.parler();
+oiseau1.voler();
+ikteb("");
+
+# ============================================
+# 11. TRY/CATCH/FINALLY
+# ============================================
+ikteb("--- 11. TRY/CATCH/FINALLY ---");
+7awel {
+    ikteb("Tentative 1: Division normale...");
+    khdem result1 = 10 / 2;
+    ikteb("Résultat: " + result1);
+} ebsed(e) {
+    ikteb("❌ Erreur: " + e);
+} akhir {
+    ikteb("✅ Finally (1)");
+}
 
 7awel {
-    ikteb("Trying something...");
-    khdem result2 = 10 / 2;
-    ikteb("Result: " + result2);
+    ikteb("Tentative 2: Division par zéro...");
+    khdem result2 = 10 / 0;
+    ikteb("Résultat: " + result2);
 } ebsed(e) {
-    ikteb("Caught error: " + e);
+    ikteb("❌ Erreur attrapée: " + e);
 } akhir {
-    ikteb("Finally block executed!");
+    ikteb("✅ Finally (2)");
+}
+ikteb("");
+
+# ============================================
+# 12. FICHIERS
+# ============================================
+ikteb("--- 12. FICHIERS ---");
+ikteb_fi_mlf("test_data.txt", "Bienvenue dans Bou.Bel!\nCeci est un test complet.");
+ikteb("✅ Fichier écrit avec succès!");
+khdem contenu = iqra_mlf("test_data.txt");
+ikteb("Contenu:");
+ikteb(contenu);
+khdem texte2 = "Nom: Ayoub\nAge: 25\nVille: Tunis";
+ikteb_fi_mlf("info.txt", texte2);
+khdem info = iqra_mlf("info.txt");
+ikteb("Informations lues:");
+ikteb(info);
+ikteb("");
+
+# ============================================
+# 13. COMBINAISON
+# ============================================
+ikteb("--- 13. COMBINAISON ---");
+dallel calculer_moyenne(tab) {
+    khdem sum = 0;
+    men i 0 7ata len(tab)-1 a3mel {
+        sum = sum + tab[i];
+    }
+    rejje sum / len(tab);
+}
+khdem mes_notes = [12, 15, 18, 14, 16, 20, 13];
+khdem moyenne_generale = calculer_moyenne(mes_notes);
+ikteb("Mes notes: " + mes_notes);
+ikteb("Moyenne: " + moyenne_generale);
+
+dallel creer_chien(nom, age, race) { rejje new Chien(nom, age, race); }
+khdem mon_chien = creer_chien("Buddy", 3, "Labrador");
+mon_chien.afficher();
+mon_chien.parler();
+ikteb("");
+
+# ============================================
+# 14. ALGORITHMES
+# ============================================
+ikteb("--- 14. ALGORITHMES ---");
+dallel rechercher(tab, val) {
+    men i 0 7ata len(tab)-1 a3mel {
+        ken tab[i] == val a3mel { rejje i; }
+    }
+    rejje -1;
+}
+khdem nombres = [5, 12, 8, 20, 3, 15, 7];
+ikteb("Nombres: " + nombres);
+ikteb("Position de 20: " + rechercher(nombres, 20));
+ikteb("Position de 99: " + rechercher(nombres, 99));
+
+dallel trier(tab) {
+    khdem n = len(tab);
+    men i 0 7ata n-2 a3mel {
+        men j 0 7ata n-i-2 a3mel {
+            ken tab[j] > tab[j+1] a3mel {
+                khdem temp = tab[j];
+                tab[j] = tab[j+1];
+                tab[j+1] = temp;
+            }
+        }
+    }
+    rejje tab;
+}
+khdem nombres_tries = trier(nombres);
+ikteb("Triés: " + nombres_tries);
+ikteb("");
+
+# ============================================
+# 15. EXEMPLES AVANCÉS
+# ============================================
+ikteb("--- 15. EXEMPLES AVANCÉS ---");
+khdem animaux = [
+    new Chien("Max", 3, "Berger"),
+    new Chat("Luna", 2),
+    new Oiseau("Titi", 1, "Rouge")
+];
+ikteb("Liste d'animaux:");
+men i 0 7ata len(animaux)-1 a3mel {
+    ikteb("Animal " + (i+1) + ":");
+    animaux[i].afficher();
+}
+dallel executer(fn, val) { rejje fn(val); }
+dallel double(x) { rejje x * 2; }
+ikteb("Double de 10 = " + executer(double, 10));
+ikteb("");
+
+# ============================================
+# 16. STATISTIQUES (renommer max en maximum)
+# ============================================
+ikteb("--- 16. STATISTIQUES ---");
+dallel valeur_min(tab) {
+    khdem min_val = tab[0];
+    men i 1 7ata len(tab)-1 a3mel {
+        ken tab[i] < min_val a3mel { min_val = tab[i]; }
+    }
+    rejje min_val;
+}
+dallel maximum(tab) {
+    khdem max_val = tab[0];
+    men i 1 7ata len(tab)-1 a3mel {
+        ken tab[i] > max_val a3mel { max_val = tab[i]; }
+    }
+    rejje max_val;
+}
+khdem stats = [3, 7, 2, 9, 5, 1, 8, 4, 6];
+ikteb("Statistiques: " + stats);
+ikteb("Min: " + valeur_min(stats));
+ikteb("Max: " + maximum(stats));
+ikteb("Moyenne: " + calculer_moyenne(stats));
+ikteb("");
+
+# ============================================
+# 17. EXCEPTIONS PERSONNALISÉES
+# ============================================
+ikteb("--- 17. EXCEPTIONS ---");
+dallel diviser(a, b) {
+    ken b == 0 a3mel { rejje "Erreur: Division par zéro!"; }
+    rejje a / b;
+}
+ikteb("10 / 2 = " + diviser(10, 2));
+ikteb("10 / 0 = " + diviser(10, 0));
+ikteb("");
+
+# ============================================
+# 18. BOUCLES IMBRIQUÉES
+# ============================================
+ikteb("--- 18. BOUCLES IMBRIQUÉES ---");
+ikteb("Table 5x5:");
+men i 1 7ata 5 a3mel {
+    khdem ligne = "";
+    men j 1 7ata 5 a3mel {
+        khdem prod = i * j;
+        ken j == 1 a3mel { ligne = str(prod); }
+        sinon { ligne = ligne + " " + str(prod); }
+    }
+    ikteb(ligne);
+}
+ikteb("");
+
+# ============================================
+# 19. RÉSULTAT FINAL
+# ============================================
+ikteb("--- 19. RÉSULTAT FINAL ---");
+khdem notes_finales = [14, 16, 18, 12, 15, 17, 19, 13, 16, 15];
+khdem moyenne_finale = calculer_moyenne(notes_finales);
+khdem min_finale = valeur_min(notes_finales);
+khdem max_finale = maximum(notes_finales);
+ikteb("📊 Résultats finaux:");
+ikteb("  Notes: " + notes_finales);
+ikteb("  Moyenne: " + moyenne_finale);
+ikteb("  Minimum: " + min_finale);
+ikteb("  Maximum: " + max_finale);
+ken moyenne_finale >= 15 a3mel {
+    ikteb("✅ Félicitations! Excellente moyenne!");
+} sinon_ken moyenne_finale >= 12 a3mel {
+    ikteb("👍 Bien! Moyenne satisfaisante.");
+} sinon {
+    ikteb("📚 Travaillez encore plus fort!");
 }
 
-ikteb("Program finished successfully!");
+ikteb("");
+ikteb("========================================");
+ikteb("  🎉 PROGRAMME TERMINÉ AVEC SUCCÈS!");
+ikteb("========================================");
+ikteb("  Bou.Bel - Langage de programmation");
+ikteb("  Tunisian Arabic Programming Language");
+ikteb("========================================");

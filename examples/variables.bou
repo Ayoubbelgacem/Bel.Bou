@@ -1,0 +1,11 @@
+khdem nom = "Ayoub";
+khdem age = 25;
+khdem taille = 1.80;
+khdem actif = s7i7;
+khdem lettre = 'A';
+
+ikteb("Nom: " + nom);
+ikteb("Age: " + age);
+ikteb("Taille: " + taille);
+ikteb("Actif: " + actif);
+ikteb("Lettre: " + lettre);

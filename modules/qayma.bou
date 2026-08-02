@@ -1,0 +1,3 @@
+fonction zid(arr, val) { retourner arr; }
+fonction ekbrej(arr) { retourner 0; }
+fonction farzez(arr) { retourner arr; }
